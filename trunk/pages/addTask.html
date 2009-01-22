@@ -1,0 +1,28 @@
+<form onsubmit="Save.task(); return false;">
+	<input type="hidden" name="action" value="addTask" />
+	<input type="hidden" name="history" value="" />
+	<div class="response"></div>
+
+	<label for="name">Nome:</label><br />
+	<input type="text" name="name" value="" maxlength="255" />
+
+	<br />
+
+	<label for="status">Status:</label><br />
+	<select name="status">
+		<option value="">Selecione...</option>
+		<option value="1">todo</option>
+		<option value="2">wip</option>
+		<option value="3">done</option>
+	</select>
+
+	<br /><br />
+
+	<label for="text">Descrição:</label><br />
+	<textarea name="text" rows="5"></textarea>
+
+	<br />
+
+	<input type="submit" value="Adicionar" />
+</form>
+<br />
