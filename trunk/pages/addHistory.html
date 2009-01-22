@@ -1,0 +1,15 @@
+<form onsubmit="saveHistory(); return false;">
+	<input type="hidden" name="action" value="addHistory" />
+
+	<label for="name">Nome: </label><br />
+	<input type="text" name="name" value="" maxlength="255" />
+
+	<br />
+
+	<label for="text">Descrição: </label><br />
+	<textarea name="text" rows="5"></textarea>
+
+	<br />
+
+	<input type="submit" value="Adicionar" />
+</form>

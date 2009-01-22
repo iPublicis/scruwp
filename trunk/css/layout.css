@@ -1,0 +1,127 @@
+html,body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	font: 16px Tahoma;
+}
+/* Header */
+#header {
+	height: 50px;
+}
+#header h1 {
+	margin: 0px 5px;
+}
+/* TABLE */
+table#main th {
+	text-align: left;
+	border: 1px solid #666666;
+	background-color: #999999;
+}
+table#main td,
+table#main th {
+	width: 25%;
+}
+table#main tfoot td {
+	text-align: right;
+}
+table#main tfoot input,
+table#main tfoot textarea {
+	width: 90%;
+	margin-left: 5%;
+}
+td.box {
+	border: 1px solid #000000;
+}
+td.history {
+}
+/* DRAGGABLE */
+span.dragBox {
+	width: 80px;
+	height: 70px;
+	margin: 5px 0 0 5px;
+	padding: 3px;
+	cursor: pointer;
+	font-size: 10px;
+	display: inline-block;
+	background-color: #000099;
+}
+span.dragBox span.text,
+span.dragBox span.name {
+	width: 100%;
+	display: inline-block;
+}
+span.dragBox span.text {
+	height: 55px;
+	overflow: hidden;
+}
+span.dragBox span.name {
+	font-size: 7px;
+}
+/* LAYOUT */
+div#backGround {
+	z-index: 333;
+	background-color: #000000;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	opacity: .5;
+	left: 0px;
+	top: 0px;
+}
+div#content {
+	z-index: 666;
+	border: 1px solid #000000;
+	background-color: #FFFFFF;
+	position: absolute;
+	overflow-y: auto;
+	height: 50%;
+	width: 50%;
+	left: 25%;
+	top: 25%;
+}
+div#content div.main {
+	padding: 10px;
+	padding-top: 36px;
+}
+div#content span.header {
+	width: 90%;
+	overflow: hidden;
+	line-height: 16px;
+	font-size: 16px;
+	position: absolute;
+	font-weight: bold;
+	top: 10px;
+	left: 10px;
+}
+div#content a.close {
+	line-height: 16px;
+	font-size: 16px;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	padding-left: 18px;
+	background: #FFFFFF url('../images/refresh.gif') no-repeat;
+}
+div#content input,
+div#content textarea {
+	width: 100%;
+}
+/* CLASSES */
+div.loading {
+	padding-left: 18px;
+	background: url('../images/loading.gif') no-repeat;
+}
+.left {
+	float: left;
+}
+.right {
+	float: right;
+}
+/* GENERAL */
+img {
+	border: 0px none;
+}
+a {
+	text-decoration: none;
+}
