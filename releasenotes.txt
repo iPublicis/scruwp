@@ -1,0 +1,10 @@
+Version 0.2;
+	* Add/Get History
+	* Add/Get/Update Task
+	* Modal update
+	* JS Modulation
+	* PHP Functions
+	* Add the release notes file;
+	
+Version 0.1:
+	* Added the base files;

@@ -5,46 +5,60 @@
         <title>[ scruwp :: Scrum With PHP ]</title>
         <script type="text/javascript" src="js/jquery.js"></script>
         <script type="text/javascript" src="js/jquery-ui.js"></script>
-        <script type="text/javascript" src="js/script.js"></script>
-		<link type="text/css" media="all" rel="stylesheet" href="css/layout.css" />
+        <script type="text/javascript" src="js/script.js?<?= rand() ?>"></script>
+		<link type="text/css" media="all" rel="stylesheet" href="css/layout.css?<?= rand() ?>" />
     </head>
     <body>
     	<div id="header">
-			<div class="center">
-	    		<h1>Scrum With PHP</h1>
-			</div>
+    		<h1>Scrum With PHP</h1>
     	</div>
-    	<table id="main" width="100%" cellspacing="1" cellpadding="1" border="0">
+    	<table id="main" width="100%" cellspacing="0" cellpadding="0" border="0">
     		<thead>
     			<tr>
-    				<th>História</th>
-    				<th>TODO</th>
-    				<th>WIP</th>
-    				<th>DONE</th>
+    				<th>
+    					<span>history</span>
+						<a href="javascript:void(0);" onclick="Add.history();">
+							<img src="images/add.gif" alt="Add" title="Add history" />
+						</a>
+					</th>
+    				<th><span>todo</span></th>
+    				<th><span>wip</span></th>
+    				<th><span>done</span></th>
     			</tr>
     		</thead>
-			<tbody>
-			</tbody>
+			<tbody></tbody>
 			<tfoot>
 				<tr>
-					<td>
-						<a href="javascript:void(0);" onclick="addHistory();" class="left">
-							<img src="images/add.gif" alt="Adicionar" title="Adicionar história" />
-						</a>
-					</td>
-					<td colspan="3">&nbsp;</td>
+					<td></td>
+					<td colspan="3"></td>
 				</tr>
 			</tfoot>
     	</table>
+    	<div id="loading" style="display:none;">
+    		<img src="images/loading.gif" alt="" title="Carregando..." />
+    	</div>
 		<div id="backGround" style="display:none;"></div>
 		<div id="content" style="display:none;">
-			<span class="header">a</span>
-			<a href="javascript:void(0);" class="close">FECHAR</a>
-			<div class="main"></div>
+			<span class="header">&nbsp;</span>
+			<a href="javascript:void(0);" class="close">CLOSE</a>
+			<div class="main">&nbsp;</div>
 		</div>
     </body>
+	<head>
+		<script type="text/javascript">
+			jQuery(function(){
+				Modal.initialize();
+				Struts.init();
+				$.ajaxSetup({
+					beforeSend: function(){
+						$('#loading').show();
+					},
+					complete: function(){
+						$('#loading').hide();
+					}
+				});
+				Show.container = $('#main > tfoot > tr > td:last');
+			});
+		</script>
+	</head>
 </html>
-<?php
-	require('includes/functions.php');
-	connect();
-?>

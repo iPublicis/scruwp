@@ -1,98 +1,216 @@
-jQuery(function(){
-	Modal.initialize();
-	
-	$('#main tbody tr').remove();
+var Struts = {
+	newTask: {},
+	init: function(){
+		Get.history();
+	},
+	history: {
+		mount: function( dados ){
+			$.each(dados,function(h,hist){
+				$('#main > tbody').append(
+					'<tr class="history '+ hist.id +'">' +
+						'<td>' +
+							'<b>'+ hist.name +'</b>'+
+							'<br />' + hist.text +
+						'</td>' +
+						'<td class="box"><img src="images/notes/new.gif" alt="+" title="1" class="addTask" /></td>' +
+						'<td class="box"><img src="images/notes/new.gif" alt="+" title="2" class="addTask" /></td>' +
+						'<td class="box"><img src="images/notes/new.gif" alt="+" title="3" class="addTask" /></td>' +
+					'</tr>'
+				).find('tr:last').data('id',hist.id)
+				 .find('img.addTask').hide().click( function(){
+				 	Struts.newTask = {
+						history: hist.id,
+						status: $(this).attr('title')
+					};
+					Add.task();
+				 } ).parent().parent().children('td.box').droppable({
+					accept: 'span.dragBox',
+					drop: function(ev, ui) {
+						// PEGA OS IDS DE HISTORIA
+						var id = ui.draggable.data('history');
+						var history = ui.element.get(0).parentNode.className.split(' ')[1];
 
-	$.each(dados.history,function(h,hist){
-		$('#main > tbody').append(
-			'<tr class="'+ hist.id +'">' +
-				'<td class="history">' +
-					'<b>'+ hist.name +'</b><br />' +
-					hist.text +
-				'</td>' +
-				'<td class="box"></td>' +
-				'<td class="box"></td>' +
-				'<td class="box"></td>' +
-			'</tr>'
-		);
+						// CANCELA SE A HISTORIA FOR DIFERENTE
+						if( id != history )
+							return false;
 
-		$.each( dados.tasks[h],function(t,task){
-			$('#main > tbody > tr:last > td')
-				.eq( task.status ).append(
-				'<span class="dragBox">' +
-					'<span class="text">' + task.text + '</span>' +
-					'<span class="name">' + task.name + '</span>' +
-				'</span>'
-			).find('span.dragBox:last').data(
-				'id',hist.id +','+ task.id
-			);
-		});
-	});
+						// SALVA O STATUS DA TASK
+						Save.status( ui.draggable );
 
-	$('span.dragBox').draggable({
-		grid: [ 10,10 ],
-		opacity: 0.7,
-		revert: true,
-		zIndex: 666
-	});
+						if (window.statusJSON) {
+							// INSERE A TASK NA TABELA
+							$(this).append($(ui.helper[0]).css({
+								'top': 0,
+								'left': 0
+							}));
+						}
 
-	$('td.box').droppable({
-		accept: 'span.dragBox',
-		drop: function(ev, ui) {
-			var data = $( ui.draggable.get(0) ).data('id').split(',');
-			var history = ui.element.get(0).parentNode.className;
+						return window.statusJSON;
+					}
+				});
 
-			// CANCELA SE A HISTORIA FOR DIFERENTE
-			if( data[0] != history )
-				return false;
+				$('#main > tbody > tr > td:gt(0)').each(function(){
+					$(this).mouseover(function(){
+						$( this ).children('img.addTask').show();
+					});
+					$(this).mouseout(function(){
+						$( this ).children('img.addTask').hide();
+					});
+				});
 
-			// INSERE A TASK NA TABELA
-			$(this).append( $(ui.helper[0]).css({
-				'top': 0, 'left': 0
-			}) );
+				Get.taskByHistory( hist.id );
+			});
 		}
-	});
-});
-
-var dados = {
-	history: [
-//		{ id: 0, name: 'Nome nº1', text: 'Lorem ipsum dolor sit amet' },
-//		{ id: 1, name: 'Segunda', text: '$(this).append( $(ui.helper[0]).css({ "top": 0, "left": 0 });' }
-	],
-	tasks: [
-//		[
-//			{ id: 0, status: 1, text: 'Lorem ipsum dolor sit amet', name: 'primeiro' },
-//			{ id: 1, status: 2, text: 'ipsum dolor sit amet', name: 'segundo' },
-//			{ id: 2, status: 3, text: 'dolor sit amet', name: 'terceiro' }
-//		],[
-//			{ id: 3, status: 1, text: 'sit amet', name: 'quarto' },
-//			{ id: 4, status: 2, text: 'amet', name: 'quinto' },
-//			{ id: 5, status: 3, text: '...', name: 'sexto' }
-//		]
-	]
+	},
+	task: {
+		mount: function( dados ){
+			$.each( dados,function(){
+				$('#main > tbody > tr.'+ this.idHistory +' > td:eq('+ this.idStatus +')')
+				.append(
+					'<span class="dragBox">' +
+						'<span class="text">' + this.text + '</span>' +
+						'<span class="name">' + this.name + '</span>' +
+					'</span>'
+				).find('span.dragBox:last')
+					.data( 'status',this.idStatus )
+					.data( 'history',this.idHistory )
+					.data( 'task',this.id ).hide().fadeIn('slow')
+					.draggable({
+						grid: [ 10,10 ],
+						opacity: 0.7,
+						revert: true,
+						zIndex: 666
+					}
+				);
+			});
+		}
+	}
 };
 
-function addHistory(){
-	Modal.load(
-		'pages/addHistory.html','Adicionar História'
-	);
-}
+var Add = {
+	history: function(){
+		Modal.load(
+			'pages/addHistory.html','Add history'
+		);
+	},
+	task: function(){
+		Modal.load(
+			'pages/addTask.html','Add Task',function(){
+				$('#content > div.main')
+					.find('select').val( Struts.newTask.status ).parent()
+					.find(':hidden[name=history]').val( Struts.newTask.history );
+			}
+		);
+	}
+};
 
-function saveHistory(){
-	var input = $('#content :input').serialize();
+var Get = {
+	dummy: function( callBack ){
+		$.get('pages/dummy.php',
+			$.isFunction( callBack ) ? callBack : function(){}
+		);
+	},
+	history: function( id ){
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: ( 'action=getHistory&id=' + id ),
+			success: function( json ){
+				if( json.count && json.count > 0 ){
+					Struts.history.mount( json.data );
+				}
+			}
+		});
+	},
+	task: function( id ){
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: ( 'action=getTask&id=' + id ),
+			success: function( json ){
+				if( json.count && json.count > 0 ){
+					Struts.task.mount( json.data );
+				}
+			}
+		});
+	},
+	taskByHistory: function( id ){
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: ( 'action=getTaskByHistory&id=' + id ),
+			success: function( json ){
+				if( json.count && json.count > 0 ){
+					Struts.task.mount( json.data );
+				}
+			}
+		});
+	}
+};
 
-	$.ajax({
-		url: 'includes/ajax.php',
-		method: 'POST',
-		data: input,
-		dataType: 'json',
-		success: function(){
-			console.log(arguments);
-		}
-	});
+var Save = {
+	history: function(){
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: $('#content :input').serialize(),
+			success: function( json ){
+				var div = $('#content > div.main div.response');
+				if( json.code == 0 ){
+					div.addClass('success').html( json.message );
+					Get.history( json.id );
+				}
+			}
+		});
+		return false;
+	},
+	task: function(){
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: $('#content :input').serialize(),
+			success: function( json ){
+				var div = $('#content > div.main div.response');
+				if( json.code == 0 ){
+					div.addClass('success').html( json.message );
+					Get.task( json.id );
+				}
+			}
+		});
+		return false;
+	},
+	status: function( span ){
+		var status = $('#main > tbody > tr > td').index( span.parent() ),
+			param = 'action=saveStatus&id='+ span.data('task') +'&status='+ status;
 
-	return false;
-}
+		$.ajax({
+			async: false,
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: param,
+			success: function(json,xhr){
+				if (json.code == 0) {
+					Show.info(json.message);
+				}
+				self.statusJSON = json.code == 0;
+			}
+		});
+
+		return self.statusJSON;
+	}
+};
 
 function printError(cod,message,sql){
  	if( $.browser.mozilla && typeof window.console == 'object' ){
@@ -109,48 +227,69 @@ function printError(cod,message,sql){
 	}
 }
 
-function loading( container,remove ){
-	if( !remove ){
-		$( container || '#content > div.main' ).empty().append('<div class="loading">Loading...</div>');
+function loading( remove ){
+	var content = $( '#content > div.main' );
+	if( remove ){
+		content.find('div.loading').remove();
 	} else {
-		$( container || '#content > div.main > div.loading' ).remove();
+		content.empty().append('<div class="loading">Carregando...</div>');
 	}
 }
+
+var Show = {
+	info: function( msg ){
+		this.container.html( msg ).addClass('info');
+	},
+	success: function( msg ){
+		this.container.html( msg ).addClass('success');
+	},
+	error: function( msg ){
+		this.container.html( msg ).addClass('error');
+	},
+	clear: function(){
+		this.container.empty().removeClass('info')
+			.removeClass('success').removeClass('error');
+	}
+};
 
 var Modal = {
 	initialize: function(){
 		$('#content > a.close').click( Modal.close );
 	},
 	open: function(){
-		$('#backGround').fadeIn('slow');
-		$('#content').fadeIn('fast');
+		$('#backGround').fadeIn('fast',function(){
+			$('#content').fadeIn('fast');
+		});
 	},
-	load: function( url,title ){
-		this.open();
-
+	load: function( url,title,callBack ){
 		var content = $('#content > div.main');
 		$('#content > span.header').html( title || '' );
+		this.open();
 
 		$.ajax({
-			cache: true,
+			cache: false,
 			url: url,
 			dataType: 'html',
 			beforeSend: function(){
-				loading();
+				loading( false );
 			},
 			success: function( response ){
-				loading(false,true);
+				loading( true );
 				content.append( response );
+				if( $.isFunction( callBack ) ){
+					callBack();
+				}
 			},
-			error: function(xhr){
-				loading(false,true);
+			error: function( xhr ){
+				loading( true );
 				content.append('<p>'+ xhr.statusText +'</p>');
 			}
 		});
 	},
 	close: function(){
-		$('#backGround').fadeOut('slow');
-		$('#content').fadeOut('fast');
-		$('#content > div.main').empty();
+		$('#content').fadeOut( 'fast',function(){
+			$('#content > div.main').empty();
+			$('#backGround').fadeOut( 'fast' );
+		} );
 	}
 };
