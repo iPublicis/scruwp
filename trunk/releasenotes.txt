@@ -1,3 +1,13 @@
+Version 0.3:
+	* Add history images;
+	* Add log from tasks;
+	* Add Sprint management;
+	* Add delete history/tasks;
+
+	BUGS fix:
+		* Tasks doesn't break when go outside the window;
+		* Removed task color black for reading propouses;
+
 Version 0.2.2:
 	* Added the favicon icon;
 

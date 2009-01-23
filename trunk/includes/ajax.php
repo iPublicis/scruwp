@@ -6,23 +6,58 @@ header('Content-type: text/json;');
 $conn = connect();
 
 switch( $_REQUEST['action'] ){
+	// SPRINT
+	case 'addSprint': addSprint(); break;
+	case 'getSprint': getSprint(); break;
 	// HISTORY
 	case 'addHistory': addHistory(); break;
 	case 'getHistory': getHistory(); break;
+	case 'deleteHistory': deleteHistory(); break;
+	case 'getHistoryBySprint': getHistoryBySprint(); break;
 	// TASK
 	case 'addTask': addTask(); break;
 	case 'getTask': getTask(); break;
+	case 'deleteTask': deleteTask(); break;
 	case 'getTaskByHistory': getTaskByHistory(); break;
+	// STATUS
 	case 'saveStatus': saveStatus(); break;
+	// DEFAULT
 	default: blank();
 }
-//	print_r( $_REQUEST );
+
+// SPRINT
+
+function addSprint(){
+	$return = insert(
+		'sprints', array( 'status','beginDate','endDate' ),
+		array( $_REQUEST['status'],toMysql($_REQUEST['beginDate']),toMysql($_REQUEST['endDate']) )
+	);
+
+	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',(
+		$return['code'] ? 'error' : 'Ok!'
+	),'" }';
+}
+
+function getSprint(){
+	$return = getJSON(
+		'sprints', array( '*' )
+	);
+
+	if( is_array( $return ) ){
+		echo '{ code: ', $return['code'], ', message: "',sanitize( $return['message'] ),(
+			$return['query'] ? '", query: "'.$return['query'] : ''
+		),'" }';
+	} else {
+		echo $return;
+	}
+}
 
 // HISTORY
 
 function addHistory(){
 	$return = insert(
-		'histories', array( 'name','text','estimate' ), array( $_REQUEST['name'],$_REQUEST['text'],$_REQUEST['estimate'] )
+		'histories', array( 'name','text','estimate','idSprint' ),
+		array( $_REQUEST['name'],$_REQUEST['text'],$_REQUEST['estimate'],$_REQUEST['idSprint'] )
 	);
 
 	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',(
@@ -39,6 +74,42 @@ function getHistory(){
 
 	if( is_array( $return ) ){
 		echo '{ code: ', $return['code'], ', message: "',sanitize( $return['message'] ),(
+			$return['query'] ? '", query: "'.$return['query'] : ''
+		),'" }';
+	} else {
+		echo $return;
+	}
+}
+
+function deleteHistory(){
+	if( startTransaction() ){
+		$tasks = delete(
+			'tasks', array( 'idHistory = '.$_REQUEST['id'] )
+		);
+
+		if( is_array( $tasks ) && $tasks['status'] ){
+			$history = delete(
+				'histories', array( 'id = '.$_REQUEST['id'] )
+			);
+
+			if( is_array( $history ) && $history['status'] ){
+				echo '{ code: 0, message: "Ok!" }';
+				return commitTransaction();
+			}
+		}
+	}
+
+	echo '{ code: 1, message: "Error!" }';
+	return rollbackTransaction();
+}
+
+function getHistoryBySprint(){
+	$return = getJSON(
+		'histories', array( '*' ), array( 'idSprint = '.$_REQUEST['id'] )
+	);
+
+	if( is_array( $return ) ){
+		echo '{ count: 0, code: ', $return['code'], ', message: "',sanitize( $return['message'] ),(
 			$return['query'] ? '", query: "'.$return['query'] : ''
 		),'" }';
 	} else {
@@ -73,6 +144,16 @@ function getTask(){
 	}
 }
 
+function deleteTask(){
+	$return = delete(
+		'tasks', array( 'id = '.$_REQUEST['id'] )
+	);
+
+	echo '{ code: ', $return['code'] ,', message: "',$return['message'],(
+			$return['query'] ? '", query: "'.$return['query'] : ''
+		),'" }';
+}
+
 function getTaskByHistory(){
 	$return = getJSON(
 		'tasks', array( '*' ), array( 'idHistory = '.$_REQUEST['id'] )
@@ -87,14 +168,19 @@ function getTaskByHistory(){
 	}
 }
 
-// TASKS STATUS
-
 function saveStatus(){
-	$return = update(
-		'tasks', array(
-			'idStatus' => $_REQUEST['status'],
-		), array( 'id = '.$_REQUEST['id'] )
+	$return = insert(
+		'tasks_log', array( 'idTask','oldStatus','newStatus' ),
+		array( $_REQUEST['id'],$_REQUEST['oldStatus'],$_REQUEST['status'] )
 	);
+
+	if( $return['status'] ){
+		$return = update(
+			'tasks', array(
+				'idStatus' => $_REQUEST['status'],
+			), array( 'id = '.$_REQUEST['id'] )
+		);
+	}
 
 	echo '{ code: ', $return['code'] ,', message: "',$return['message'],(
 		$return['query'] ? '", query: "'.$return['query'] : ''

@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 require('config.php');
 
 function connect(){
@@ -37,6 +37,25 @@ function sanitize( $buf ){
 	return str_replace( '"',"'", str_replace( "\n",'',$buf ) );
 }
 
+function toMysql( $date = false ){
+	if( !$date )
+		return $date;
+
+	return implode( "-",array_reverse( explode( "/",$date ) ) );
+}
+
+function startTransaction(){
+	return (bool) mysql_query( 'START TRANSACTION;' );
+}
+
+function rollbackTransaction(){
+	return (bool) mysql_query( 'ROLLBACK;' );
+}
+
+function commitTransaction(){
+	return (bool) mysql_query( 'COMMIT;' );
+}
+
 function insert( $table = false, $fields = false, $values = false ){
 	if( !$table || !is_array( $fields ) || !is_array( $values ) ){
 		return array(
@@ -48,7 +67,7 @@ function insert( $table = false, $fields = false, $values = false ){
 				$table.
 					' ('. implode( ',',$fields ) .') '.
 				' VALUES '.
-					' ("'. implode( '","',$values ) .'")';
+					' ("'. implode( '","',$values ) .'");';
 
 	$query = mysql_query( $sql );
 
@@ -77,11 +96,11 @@ function select( $table = false, $fields = false, $where = false ){
 			' FROM '.
 				$table.
 			( is_array( $where ) && count( $where ) ?
-				' WHERE '.implode( ' AND ',$where ) : '' );
+				' WHERE '.implode( ' AND ',$where ) : '' ).';';
 
 	$result = mysql_query( $sql );
 
-	if( $result && mysql_num_rows( $result ) > 0 ){
+	if( $result ){
 		$data = array();
 
 		while( $buf = mysql_fetch_assoc( $result ) ){
@@ -112,8 +131,25 @@ function update( $table = false, $values = false, $where = false ){
 		$sql .= ( $i++ ? ',' : '' ).$field.' = "'. $value .'"';
 	}
 	
-	$sql .= $where && is_array( $where )
-		? ' WHERE '. implode( ' AND ',$where ) : '';
+	$sql .= ( $where && is_array( $where )
+		? ' WHERE '. implode( ' AND ',$where ) : '' ).';';
+
+	$query = mysql_query( $sql );
+
+	return array(
+		'status' => ( $query && mysql_affected_rows() > 0 ), 'code' => mysql_errno(),
+		'message' => sanitize( mysql_error() ), 'query' => sanitize( $sql )
+	);
+}
+
+function delete( $table = false, $where = false ){
+	if( !$table || !is_array( $where ) ){
+		return array(
+			'status' => false, 'code' => 1, 'message' => 'Parâmetros inválidos'
+		);
+	}
+
+	$sql = 'DELETE FROM '.$table.' WHERE '.implode( ' AND ',$where ).';';
 
 	$query = mysql_query( $sql );
 
