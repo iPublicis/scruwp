@@ -3,6 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8;"/>
         <title>[ scruwp :: Scrum With PHP ]</title>
+		<link rel="shortcut icon" href="favicon.ico">
         <script type="text/javascript" src="js/jquery.js"></script>
         <script type="text/javascript" src="js/jquery-ui.js"></script>
         <script type="text/javascript" src="js/script.js?<?= rand() ?>"></script>
