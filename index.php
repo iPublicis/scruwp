@@ -1,13 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8;"/>
         <title>[ scruwp :: Scrum With PHP ]</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8;"/>
 		<link rel="shortcut icon" href="favicon.ico">
-        <script type="text/javascript" src="js/jquery.js"></script>
-        <script type="text/javascript" src="js/jquery-ui.js"></script>
-        <script type="text/javascript" src="js/script.js?<?= rand() ?>"></script>
-		<link type="text/css" media="all" rel="stylesheet" href="css/layout.css?<?= rand() ?>" />
+		<link rel="stylesheet" href="css/layout.css" type="text/css" media="all" />
     </head>
     <body>
     	<div id="header">
@@ -22,17 +19,32 @@
 							<img src="images/add.gif" alt="Add" title="Add history" />
 						</a>
 					</th>
-    				<th><span>todo</span></th>
-    				<th><span>wip</span></th>
-    				<th><span>done</span></th>
+    				<th>
+    					<span>todo</span>
+					</th>
+    				<th>
+    					<span>wip</span>
+					</th>
+    				<th>
+    					<span>done</span>
+					</th>
     			</tr>
     		</thead>
 			<tbody></tbody>
 			<tfoot>
-				<tr>
-					<td></td>
-					<td colspan="3"></td>
-				</tr>
+    			<tr>
+    				<td>&nbsp;</td>
+    				<td colspan="2">&nbsp;</td>
+    				<td align="right">
+    					<img src="images/add.gif" class="addSprint" alt="+" title="Add sprint" />
+    					<label for="sprintSelect">Sprint: </label>
+    					<select id="sprintSelect">
+    						<optgroup label="Sprints">
+    							<option value="">...</option>
+							</optgroup>
+						</select>
+    				</td>
+    			</tr>
 			</tfoot>
     	</table>
     	<div id="loading" style="display:none;">
@@ -46,19 +58,14 @@
 		</div>
     </body>
 	<head>
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript" src="js/jquery-ui.js"></script>
+        <script type="text/javascript" src="js/script.js?<?= rand() ?>"></script>
 		<script type="text/javascript">
 			jQuery(function(){
-				Modal.initialize();
+				$('#main > tbody > tr:odd > td').css('background-color','#F9F9F9');
+				$('#main > tfoot > tr > td:last > img.addSprint').click( Add.sprint );
 				Struts.init();
-				$.ajaxSetup({
-					beforeSend: function(){
-						$('#loading').show();
-					},
-					complete: function(){
-						$('#loading').hide();
-					}
-				});
-				Show.container = $('#main > tfoot > tr > td:last');
 			});
 		</script>
 	</head>

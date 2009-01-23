@@ -20,7 +20,8 @@ div#loading {
 /* TABLE */
 table#main thead th {
 	padding: 3px;
-	background-color: #DDDDDD;
+	background-color: #EEEEEE;
+	border-bottom: 1px solid #CCCCCC;
 }
 table#main thead th span {
 	text-transform: uppercase;
@@ -40,23 +41,37 @@ table#main tbody td {
 table#main tbody tr.history td {
 	padding: 5px;
 	vertical-align: top;
+	border-bottom: 1px solid #CCCCCC;
+}
+table#main tbody tr img.deleteHistory {
+	cursor: pointer;
+	float: right;
+}
+table#main tbody tr td.box {
+	vertical-align: top;
+	border-left: 1px solid #CCCCCC;
+}
+table#main tbody tr td.box img.addTask {
+	float: right;
+	cursor: pointer;
+}
+table#main tbody tr td.hoverBox {
+	border: 1px solid #CCCCCC;
+	background-color: #DDDDDD;
 }
 table#main tfoot td {
 	padding: 3px;
 }
 table#main tfoot input,
 table#main tfoot textarea {
-	width: 90%;
 	margin-left: 5%;
+	width: 90%;
 }
-/* TABLE */
-td.box {
-	vertical-align: top;
-	border: 1px solid #000000;
-}
-td.box img.addTask {
-	float: right;
+table#main tfoot td img.addSprint {
+	position: relative;
+	margin-right: 3px;
 	cursor: pointer;
+	top: 2px;
 }
 /* DRAGGABLE */
 span.dragBox {
@@ -67,6 +82,12 @@ span.dragBox {
 	cursor: pointer;
 	font-size: 10px;
 	display: inline-block;
+}
+span.dragBox img.deleteTask {
+	position: absolute;
+	cursor: pointer;
+	right: 2px;
+	top: 2px;
 }
 span.dragBox span.text,
 span.dragBox span.name {
@@ -144,7 +165,7 @@ div#content textarea {
 	width: 100%;
 }
 /* CLASSES */
-div.loading {
+.loading {
 	padding-left: 18px;
 	background: url('../images/loading.gif') no-repeat;
 }
