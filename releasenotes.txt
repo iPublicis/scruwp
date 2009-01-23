@@ -1,3 +1,10 @@
+Version 0.2.1;
+	* Added Estimate in history data;
+	* Added color to add/get tasks;
+	* Added the MySQL dump database;
+	* Corrected ths tasks images;
+	* Minor CSS fix;
+
 Version 0.2;
 	* Add/Get History
 	* Add/Get/Update Task

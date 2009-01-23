@@ -9,7 +9,10 @@ var Struts = {
 				$('#main > tbody').append(
 					'<tr class="history '+ hist.id +'">' +
 						'<td>' +
-							'<b>'+ hist.name +'</b>'+
+							'<span>'+
+								'[ <i>'+ hist.estimate +'</i> ] '+
+								'<b>'+ hist.name +'</b>'+
+							'</span>'+
 							'<br />' + hist.text +
 						'</td>' +
 						'<td class="box"><img src="images/notes/new.gif" alt="+" title="1" class="addTask" /></td>' +
@@ -35,7 +38,7 @@ var Struts = {
 							return false;
 
 						// SALVA O STATUS DA TASK
-						Save.status( ui.draggable );
+						Save.status( ui.draggable, ui.element );
 
 						if (window.statusJSON) {
 							// INSERE A TASK NA TABELA
@@ -67,7 +70,7 @@ var Struts = {
 			$.each( dados,function(){
 				$('#main > tbody > tr.'+ this.idHistory +' > td:eq('+ this.idStatus +')')
 				.append(
-					'<span class="dragBox">' +
+					'<span class="dragBox" style="background-color:#'+ this.color +'">' +
 						'<span class="text">' + this.text + '</span>' +
 						'<span class="name">' + this.name + '</span>' +
 					'</span>'
@@ -104,6 +107,7 @@ var Add = {
 	}
 };
 
+//TODO: Fazer UM request para todas as historias e um para as tasks
 var Get = {
 	dummy: function( callBack ){
 		$.get('pages/dummy.php',
@@ -189,9 +193,13 @@ var Save = {
 		});
 		return false;
 	},
-	status: function( span ){
-		var status = $('#main > tbody > tr > td').index( span.parent() ),
+	status: function( span,td ){
+		var history = span.data('history'),
+			status = $('#main > tbody > tr.'+ history +' > td').index( td ),
 			param = 'action=saveStatus&id='+ span.data('task') +'&status='+ status;
+
+		if( status == span.data('status') )
+			return true;
 
 		$.ajax({
 			async: false,

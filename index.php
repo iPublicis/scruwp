@@ -10,7 +10,7 @@
     </head>
     <body>
     	<div id="header">
-    		<h1>Scrum With PHP</h1>
+    		<h1>Scuwp :: Scrum With PHP</h1>
     	</div>
     	<table id="main" width="100%" cellspacing="0" cellpadding="0" border="0">
     		<thead>

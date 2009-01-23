@@ -20,7 +20,7 @@ div#loading {
 /* TABLE */
 table#main thead th {
 	padding: 3px;
-	background-color: #CCCCCC;
+	background-color: #DDDDDD;
 }
 table#main thead th span {
 	text-transform: uppercase;
@@ -39,6 +39,7 @@ table#main tbody td {
 }
 table#main tbody tr.history td {
 	padding: 5px;
+	vertical-align: top;
 }
 table#main tfoot td {
 	padding: 3px;
@@ -66,7 +67,6 @@ span.dragBox {
 	cursor: pointer;
 	font-size: 10px;
 	display: inline-block;
-	background-color: #000099;
 }
 span.dragBox span.text,
 span.dragBox span.name {

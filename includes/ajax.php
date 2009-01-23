@@ -22,7 +22,7 @@ switch( $_REQUEST['action'] ){
 
 function addHistory(){
 	$return = insert(
-		'histories', array( 'name','text' ), array( $_REQUEST['name'],$_REQUEST['text'] )
+		'histories', array( 'name','text','estimate' ), array( $_REQUEST['name'],$_REQUEST['text'],$_REQUEST['estimate'] )
 	);
 
 	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',(
@@ -50,8 +50,8 @@ function getHistory(){
 
 function addTask(){
 	$return = insert(
-		'tasks', array( 'idHistory','idStatus','name','text' ),
-		array( $_REQUEST['history'],$_REQUEST['status'],$_REQUEST['name'],$_REQUEST['text'] )
+		'tasks', array( 'idHistory','idStatus','name','text','color' ),
+		array( $_REQUEST['history'],$_REQUEST['status'],$_REQUEST['name'],$_REQUEST['text'],$_REQUEST['color'] )
 	);
 
 	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',$return['message'],(
@@ -86,6 +86,8 @@ function getTaskByHistory(){
 		echo $return;
 	}
 }
+
+// TASKS STATUS
 
 function saveStatus(){
 	$return = update(
