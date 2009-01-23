@@ -137,7 +137,7 @@ function update( $table = false, $values = false, $where = false ){
 	$query = mysql_query( $sql );
 
 	return array(
-		'status' => ( $query && mysql_affected_rows() > 0 ), 'code' => mysql_errno(),
+		'status' => (bool)$query, 'code' => mysql_errno(),
 		'message' => sanitize( mysql_error() ), 'query' => sanitize( $sql )
 	);
 }

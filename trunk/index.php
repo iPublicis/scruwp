@@ -15,8 +15,8 @@
     			<tr>
     				<th>
     					<span>history</span>
-						<a href="javascript:void(0);" onclick="Add.history();">
-							<img src="images/add.gif" alt="Add" title="Add history" />
+						<a href="javascript:void(0);" class="addHistory" onclick="Add.history();">
+							<img src="images/history/new.gif" alt="Add" title="Add history" />
 						</a>
 					</th>
     				<th>
@@ -33,16 +33,24 @@
 			<tbody></tbody>
 			<tfoot>
     			<tr>
-    				<td>&nbsp;</td>
+    				<td>
+    					<b>Inicio:</b>&nbsp;<span></span>
+						&nbsp;
+						<b>Fim:</b>&nbsp;<span></span>
+    				</td>
     				<td colspan="2">&nbsp;</td>
     				<td align="right">
-    					<img src="images/add.gif" class="addSprint" alt="+" title="Add sprint" />
-    					<label for="sprintSelect">Sprint: </label>
+    					<label for="sprintSelect"><b>Sprint:</b></label>
     					<select id="sprintSelect">
     						<optgroup label="Sprints">
     							<option value="">...</option>
 							</optgroup>
 						</select>
+    					<img src="images/sprint/settings.gif" class="actSprint" alt="+" title="Sprint actions" />
+						<div class="sprintOpt" style="display: none;">
+	    					<img src="images/sprint/add.gif" class="sprint addSprint" alt="+" title="Add sprint" />
+	    					<img src="images/sprint/sprint.gif" class="sprint defaultSprint" alt="*" title="Sprint default" />
+						</div>
     				</td>
     			</tr>
 			</tfoot>
@@ -70,3 +78,26 @@
 		</script>
 	</head>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,7 +6,9 @@ var Struts = {
 		// MODAL CORRECTIONS
 		Modal.initialize();
 		// EVENT CHANGE SPRINT
-		Struts.sprint.initSelectAction();
+		Struts.sprint.init();
+		// MESSAGES INIT
+		Show.init();
 		// LOADING FROM AJAX REQUEST
 		$.ajaxSetup({
 			beforeSend: function(){
@@ -16,12 +18,30 @@ var Struts = {
 				$('#loading').hide();
 			}
 		});
-		// CONTAINER FOR MESSAGES
-		Show.container = $('#main > tfoot > tr > td:last');
 	},
 	sprint: {
+		init: function(){
+			Struts.sprint.actionMenu();
+			Struts.sprint.initSelectAction();
+		},
+		actionMenu: function(){
+			$('img.addSprint').click( Add.sprint );
+			$('img.actSprint').click(function(){
+				$(this).siblings('div').toggle( 'fast' );
+			});
+			$('img.defaultSprint').click( Save.defaultSprint );
+		},
 		initSelectAction: function(){
-			$('#sprintSelect').change(function( select ){
+			$('#sprintSelect').change(function(){
+				var option = $('#sprintSelect option:selected');
+
+				$('a.addHistory')[ this.status ? 'show' : 'hide' ]();
+				$('img.actSprint')[ this.value ? 'show' : 'hide' ]();
+
+				$('#main > tfoot > tr > td:first')
+					.children('span:first').html( option.data('beginDate').dateToPtBr() )
+					.children('span:last' ).html( option.data('endDate').dateToPtBr() );
+
 				if( this.value ) {
 					Get.historyBySprint( this.value );
 				}
@@ -29,71 +49,68 @@ var Struts = {
 		},
 		mountSelect: function( dados ){
 			var selected = false;
-			$('#sprintSelect > optgroup:first > option:gt(0)').remove();
+			$('#sprintSelect > optgroup:first > option'+ (
+				dados.length ? '' : ':gt(0)'
+			) ).remove();
+
+			$('a.addHistory,img.actSprint')[
+				 $('#sprintSelect').val( selected ).val() ? 'show' : 'hide'
+			]();
 
 			$.each(dados,function(i){
-				if( !selected )
-					selected = this.status ? this.id : selected;
+				if( !selected && parseInt( this.status ) ){
+					selected = this.id;
+				}
 
 				$('#sprintSelect > optgroup:first').append(
 					'<option value="'+ this.id +'">#'+ this.id +'</option>'
-				);
+				).children('option:last')
+					.data( 'status',parseInt(this.status) )
+					.data( 'beginDate',this.beginDate )
+					.data( 'endDate',this.endDate );
 
-				$('#sprintSelect').val( selected );
+				$('a.addHistory,img.actSprint')[
+					 $('#sprintSelect').val( selected ).val() ? 'show' : 'hide'
+				]();
 			});
 
 			if( selected ){
 				Get.historyBySprint( selected );
+				var option = $('#sprintSelect option:selected');
+				$('#main > tfoot > tr > td:first')
+					.children('span:first').html( option.data('beginDate').dateToPtBr() )
+					.siblings('span:last' ).html( option.data('endDate').dateToPtBr() );
 			}
 		}
 	},
 	history: {
 		mount: function( dados ){
+			// VERIFY IF THE SPRINT IS THE ACTIVE
+			var active = $('#sprintSelect :selected').data('status');
+
+			// MOUNT EACH HISTORY LINE
 			$.each(dados,function(h,hist){
 				$('#main > tbody').append(
 					'<tr class="history '+ hist.id +'">' +
 						'<td class="description">' +
-							'<img src="images/history/delete.gif" class="deleteHistory" alt="X" title="Delete history" />' +
+							( active ? '<img src="images/history/delete.gif" class="deleteHistory" alt="X" title="Delete history" />' : '' ) +
 							'<span>'+
-								'<i>'+ hist.estimate +'</i>&nbsp;'+
+								'<sup>'+ hist.estimate +'</sup>&nbsp;'+
 								'<b>'+ hist.name +'</b>'+
 							'</span>'+
 							'<br /><i>' + hist.text + '</i>' +
 						'</td>' +
-						'<td class="box"><img src="images/notes/new.gif" alt="+" title="1" class="addTask" /></td>' +
-						'<td class="box"><img src="images/notes/new.gif" alt="+" title="2" class="addTask" /></td>' +
-						'<td class="box"><img src="images/notes/new.gif" alt="+" title="3" class="addTask" /></td>' +
+						'<td class="box">'+ ( active ? '<img src="images/notes/new.gif" alt="+" title="1" class="addTask" />' : '' ) +'</td>' +
+						'<td class="box">'+ ( active ? '<img src="images/notes/new.gif" alt="+" title="2" class="addTask" />' : '' ) +'</td>' +
+						'<td class="box">'+ ( active ? '<img src="images/notes/new.gif" alt="+" title="3" class="addTask" />' : '' ) +'</td>' +
 					'</tr>'
-				).find('tr:last').data('id',hist.id).children('td.box')
-				.droppable({
-					hoverClass: 'hoverBox',
-					accept: 'span.dragBox',
-					drop: function(ev, ui) {
-						// PEGA OS IDS DE HISTORIA
-						var id = ui.draggable.data('history');
-						var history = ui.element.get(0).parentNode.className.split(' ')[1];
-
-						// CANCELA SE A HISTORIA FOR DIFERENTE
-						if( id != history )
-							return false;
-
-						// SALVA O STATUS DA TASK
-						Save.status( ui.draggable, ui.element );
-
-						if (window.statusJSON) {
-							// INSERE A TASK NA TABELA
-							$(this).append($(ui.helper[0]).css({
-								'top': 0,
-								'left': 0
-							}));
-						}
-
-						return window.statusJSON;
-					}
-				});
+				).find('tr:last').data('id',hist.id);
 
 				Get.taskByHistory( hist.id );
-			});				
+			});
+			
+			// IF !ACTIVE DOESNT INIT THE ACTIONS
+			if( !active ) return false;
 
 			// MAKE THE HISTORY ACTIONS
 			$('#main > tbody > tr > td.description').each(function(){
@@ -115,6 +132,35 @@ var Struts = {
 
 			// MAKE THE ADD TASK ACTIONS
 			$('#main > tbody > tr > td:gt(0)').each(function(){
+				// MAKE THE TD A DROPZONE
+				$(this).droppable({
+					hoverClass: 'hoverBox',
+					accept: 'span.dragBox',
+					drop: function(ev, ui) {
+						// PEGA OS IDS DE HISTORIA
+						var id = ui.draggable.data('history');
+						var history = ui.element.get(0).parentNode.className.split(' ')[1];
+
+						// CANCELA SE A HISTORIA FOR DIFERENTE
+						if( id != history )
+							return false;
+
+						// SALVA O STATUS DA TASK
+						Save.taskStatus( ui.draggable, ui.element );
+
+						if( window.statusJSON ){
+							// INSERE A TASK NA TABELA
+							$(this).append($(ui.helper[0]).css({
+								'top': 0,
+								'left': 0
+							}));
+						}
+
+						// RETURN THE STATUS
+						return window.statusJSON;
+					}
+				});
+
 				// IMAGE ADD ACTION
 				$(this).children('img.addTask').click( function(){
 				 	Struts.newTask = {
@@ -122,10 +168,12 @@ var Struts = {
 						status: $(this).attr('title')
 					}; Add.task();
 				}).hide();
+
 				// IMAGE ADD MOUSEOVER
 				$(this).mouseover(function(){
 					$( this ).children('img.addTask').show();
 				});
+
 				// IMAGE ADD MOUSEOUT
 				$(this).mouseout(function(){
 					$( this ).children('img.addTask').hide();
@@ -135,39 +183,44 @@ var Struts = {
 	},
 	task: {
 		mount: function( dados ){
+			var active = $('#sprintSelect :selected').data('status');
+
 			$.each( dados,function(){
-				$('#main > tbody > tr.'+ this.idHistory +' > td:eq('+ this.idStatus +')')
-				.append(
-					'<span class="dragBox" style="background-color:#'+ this.color +'">' +
-						'<span class="text">' + this.text + '</span>' +
-						'<span class="name">' + this.name + '</span>' +
-						'<img src="images/notes/delete.gif" class="deleteTask" alt="X" title="Delete task" />' +
-					'</span>'
-				).find('span.dragBox:last')
-					.data( 'status',this.idStatus )
+				var tds = $('#main > tbody > tr.'+ this.idHistory +' > td:eq('+ this.idStatus +')')
+					.append(
+						'<span class="dragBox" style="background-color:#'+ this.color +'">' +
+							'<span class="text">' + this.text + '</span>' +
+							'<span class="name">' + this.name + '</span>' +
+							( active ? '<img src="images/notes/delete.gif" class="deleteTask" alt="X" title="Delete task" />' : '' ) +
+						'</span>' )
+					.find('span.dragBox:last')
 					.data( 'history',this.idHistory )
-					.data( 'task',this.id ).hide().fadeIn('slow')
-					.draggable({
-				 		containment: 'window',
-						grid: [ 10,10 ],
-						opacity: 0.7,
-						revert: true,
-						zIndex: 666,
-						cursor: 'move'
-					}
-				).children('img.deleteTask').hide().click(function(){
+					.data( 'status',this.idStatus )
+					.data( 'task',this.id )
+					.hide().fadeIn('slow')
+					.children('img.deleteTask').hide();
+			});
+
+			if( !active )
+				return false;
+
+			$('#main > tbody > tr > td:gt(0) > span.dragBox').each(function(){
+				var span = $(this);
+				span.draggable({
+					containment: 'window',
+					grid: [10, 10],
+					opacity: 0.7,
+					revert: true,
+					zIndex: 666,
+					cursor: 'move'
+				}).mouseover(function(){
+					$( this ).children('img.deleteTask').show();
+				}).mouseout(function(){
+					$( this ).children('img.deleteTask').hide();
+				}).children('img.deleteTask').click(function(){
 					Delete.task(
 						$(this).parent().data('task'), $(this).parent()
 					);
-				});
-			});
-
-			$('#main > tbody > tr > td:gt(0) > span.dragBox').each(function(){
-				$(this).mouseover(function(){
-					$( this ).children('img.deleteTask').show();
-				});
-				$(this).mouseout(function(){
-					$( this ).children('img.deleteTask').hide();
 				});
 			});
 		}
@@ -181,11 +234,9 @@ var Add = {
 		);
 	},
 	history: function(){
-		if( $('#sprintSelect').val() ){
-			Modal.load(
-				'pages/addHistory.html','Add history'
-			);
-		}
+		Modal.load(
+			'pages/addHistory.html','Add history'
+		);
 	},
 	task: function(){
 		Modal.load(
@@ -219,6 +270,9 @@ var Get = {
 		});
 	},
 	historyBySprint: function( id ){
+		if( !id )
+			return false;
+
 		$.ajax({
 			cache: false,
 			method: 'POST',
@@ -234,6 +288,9 @@ var Get = {
 		});
 	},
 	history: function( id ){
+		if( !id )
+			return false;
+
 		$.ajax({
 			cache: false,
 			method: 'POST',
@@ -248,6 +305,9 @@ var Get = {
 		});
 	},
 	task: function( id ){
+		if( !id )
+			return false;
+
 		$.ajax({
 			cache: false,
 			method: 'POST',
@@ -262,6 +322,9 @@ var Get = {
 		});
 	},
 	taskByHistory: function( id ){
+		if( !id )
+			return false;
+
 		$.ajax({
 			cache: false,
 			method: 'POST',
@@ -286,9 +349,10 @@ var Save = {
 			url: 'includes/ajax.php',
 			data: $('#content :input').serialize(),
 			success: function( json ){
-				Modal.close(function(){
-					Get.sprint();
-				});
+				if( !json.code )
+					Modal.close(function(){
+						Get.sprint();
+					});
 			}
 		});
 	},
@@ -330,7 +394,7 @@ var Save = {
 		});
 		return false;
 	},
-	status: function( span,td ){
+	taskStatus: function( span,td ){
 		var history = span.data('history'),
 			status = $('#main > tbody > tr.'+ history +' > td').index( td ),
 			param = 'action=saveStatus&id='+ span.data('task') +
@@ -356,55 +420,94 @@ var Save = {
 		});
 
 		return self.statusJSON;
+	},
+	defaultSprint: function( id ){
+		var selected = $('#sprintSelect :selected');
+
+		if( parseInt( selected.data('status') ) ){
+			Show.info( 'O Sprint <b>'+ selected.html() +'</b> já é o atual!' );
+			return false;
+		}
+
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: 'action=defaultSprint&id='+ selected.val(),
+			success: function( json ){
+				$('#main > tfoot > tr > td:last > div').hide();
+				if( json.code == 0 ){
+					Show.success( json.message );
+					Get.sprint();
+				} else {
+					Show.error( json.message );
+				}
+			}
+		});
+		return false;
 	}
 };
 
 var Delete = {
 	history: function( id,history ) {
-		$.ajax({
-			cache: false,
-			method: 'POST',
-			dataType: 'json',
-			url: 'includes/ajax.php',
-			data: ( 'action=deleteHistory&id='+ id ),
-			success: function( json ){
-				if( json.code == 0 ){
-					history.fadeOut( 'slow' );
+		if( confirm( 'Deseja remover a estória?' ) ){
+			$.ajax({
+				cache: false,
+				method: 'POST',
+				dataType: 'json',
+				url: 'includes/ajax.php',
+				data: ( 'action=deleteHistory&id='+ id ),
+				success: function( json ){
+					if( json.code == 0 ){
+						history.fadeOut( 'slow' );
+					}
 				}
-			}
-		});
+			});
+		}
 		return false;
 	},
 	task: function( id,task ){
-		$.ajax({
-			cache: false,
-			method: 'POST',
-			dataType: 'json',
-			url: 'includes/ajax.php',
-			data: ( 'action=deleteTask&id='+ id ),
-			success: function( json ){
-				if( json.code == 0 ){
-					task.fadeOut( 'slow' );
+		if( prompt( 'Deseja remover a task?' ) ){
+			$.ajax({
+				cache: false,
+				method: 'POST',
+				dataType: 'json',
+				url: 'includes/ajax.php',
+				data: ( 'action=deleteTask&id='+ id ),
+				success: function( json ){
+					if( json.code == 0 ){
+						task.fadeOut( 'slow' );
+					}
 				}
-			}
-		});
+			});
+		}
 		return false;
 	}
 };
 
 var Show = {
+	init: function(){
+		// CONTAINER FOR MESSAGES
+		Show.container = $('#main > tfoot > tr > td').eq(1);
+		// CLEAR THE CONTAINER MESSAGE
+		Show.container.click(function(){ Show.clear(); });
+	},
 	info: function( msg ){
-		this.container.html( msg ).addClass('info');
+		this.message( msg,'info' );
 	},
 	success: function( msg ){
-		this.container.html( msg ).addClass('success');
+		this.message( msg,'success' );
 	},
 	error: function( msg ){
-		this.container.html( msg ).addClass('error');
+		this.message( msg,'error' );
+	},
+	message: function( msg,css){
+		this.clear();
+		this.container.html( msg ).addClass( css ).addClass( 'pointer' );
 	},
 	clear: function(){
-		this.container.empty().removeClass('info')
-			.removeClass('success').removeClass('error');
+		this.container.empty().removeClass();
 	}
 };
 
@@ -430,15 +533,16 @@ var Modal = {
 				loading( false );
 			},
 			success: function( response ){
-				loading( true );
 				content.append( response );
 				if( $.isFunction( callBack ) ){
 					callBack();
 				}
 			},
 			error: function( xhr ){
-				loading( true );
 				content.append('<p>'+ xhr.statusText +'</p>');
+			},
+			complete: function(){
+				loading( true );
 			}
 		});
 	},
@@ -453,6 +557,10 @@ var Modal = {
 		} );
 	}
 };
+
+String.prototype.dateToPtBr = function(){
+	return this.split( '-' ).reverse().join('/');
+}
 
 function printError(cod,message,sql){
  	if( $.browser.mozilla && typeof window.console == 'object' ){
