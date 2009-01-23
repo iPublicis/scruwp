@@ -1,3 +1,13 @@
+Version 0.5:
+	* Team managment;
+	* Options button;
+	* Make default sprint;
+	* Change addHistory place to options;
+	* Some tweak fix for performace;
+
+	BUGS fix:
+		* Wrong task position after scrolling the page;
+
 Version 0.4:
 	* Add Sprint menu;
 	* Add sprint default action;

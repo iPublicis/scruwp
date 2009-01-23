@@ -13,16 +13,13 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
+
 --
 -- Create schema scruwp
 --
 
 CREATE DATABASE IF NOT EXISTS scruwp;
 USE scruwp;
-
---
--- Definition of table `scruwp`.`histories`
---
 
 DROP TABLE IF EXISTS `scruwp`.`histories`;
 CREATE TABLE  `scruwp`.`histories` (
@@ -32,24 +29,17 @@ CREATE TABLE  `scruwp`.`histories` (
   `text` text collate utf8_unicode_ci NOT NULL,
   `estimate` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Definition of table `scruwp`.`sprints`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `scruwp`.`sprints`;
 CREATE TABLE  `scruwp`.`sprints` (
   `id` int(10) unsigned NOT NULL auto_increment,
+  `idTeam` int(10) unsigned NOT NULL,
   `status` tinyint(1) default '0',
   `beginDate` date default NULL,
   `endDate` date default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
-
---
--- Definition of table `scruwp`.`status`
---
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `scruwp`.`status`;
 CREATE TABLE  `scruwp`.`status` (
@@ -57,10 +47,6 @@ CREATE TABLE  `scruwp`.`status` (
   `name` varchar(255) collate utf8_unicode_ci NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Definition of table `scruwp`.`tasks`
---
 
 DROP TABLE IF EXISTS `scruwp`.`tasks`;
 CREATE TABLE  `scruwp`.`tasks` (
@@ -72,11 +58,7 @@ CREATE TABLE  `scruwp`.`tasks` (
   `text` text collate utf8_unicode_ci NOT NULL,
   `color` char(6) collate utf8_unicode_ci default 'FFFFFF',
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Definition of table `scruwp`.`tasks_log`
---
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `scruwp`.`tasks_log`;
 CREATE TABLE  `scruwp`.`tasks_log` (
@@ -86,11 +68,14 @@ CREATE TABLE  `scruwp`.`tasks_log` (
   `newStatus` int(11) NOT NULL,
   `time` timestamp NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
---
--- Definition of table `scruwp`.`users`
---
+DROP TABLE IF EXISTS `scruwp`.`teams`;
+CREATE TABLE  `scruwp`.`teams` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `scruwp`.`users`;
 CREATE TABLE  `scruwp`.`users` (
@@ -103,16 +88,14 @@ CREATE TABLE  `scruwp`.`users` (
   KEY `idUserType` (`idUserType`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
---
--- Definition of table `scruwp`.`users_type`
---
-
 DROP TABLE IF EXISTS `scruwp`.`users_type`;
 CREATE TABLE  `scruwp`.`users_type` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(255) collate utf8_unicode_ci NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

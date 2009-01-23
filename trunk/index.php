@@ -2,22 +2,75 @@
 <html>
     <head>
         <title>[ scruwp :: Scrum With PHP ]</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8;"/>
 		<link rel="shortcut icon" href="favicon.ico">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8;"/>
 		<link rel="stylesheet" href="css/layout.css" type="text/css" media="all" />
     </head>
     <body>
     	<div id="header">
-    		<h1>Scuwp :: Scrum With PHP</h1>
+    		<h1>Scruwp :: Scrum With PHP</h1>
     	</div>
     	<table id="main" width="100%" cellspacing="0" cellpadding="0" border="0">
     		<thead>
     			<tr>
+    				<th></th>
+    				<th colspan="2"></th>
+    				<th class="options">
+    					<span class="button">Opções</span>
+						<div class="container" style="display: none;">
+							<ul>
+								<li class="team">
+									<nobr>
+				    					<label for="teamSelect"><b>Team:</b></label>
+				    					<select id="teamSelect">
+				    						<optgroup label="Teams">
+				    							<option value="">...</option>
+											</optgroup>
+										</select>
+									</nobr>
+									<ul>
+										<li>
+											<a href="javascript:void(0);" class="addTeam link">Adicionar</a>
+										</li>
+									</ul>
+								</li>
+								<li>&nbsp;</li>
+								<li class="sprint">
+									<nobr>
+				    					<label for="sprintSelect"><b>Sprint:</b></label>
+				    					<select id="sprintSelect">
+				    						<optgroup label="Sprints">
+				    							<option value="">...</option>
+											</optgroup>
+										</select>
+									</nobr>
+									<ul>
+										<li>
+											<a href="javascript:void(0);" class="addSprint link">Adicionar</a>
+										</li>
+										<li>
+											<a href="javascript:void(0);" class="defaultSprint link">Marcar atual</a>
+										</li>
+									</ul>
+								</li>
+								<li>&nbsp;</li>
+								<li class="history">
+									<nobr>
+				    					<label for="sprintSelect"><b>History:</b></label>
+									</nobr>
+									<ul>
+										<li>
+											<a href="javascript:void(0);" class="addHistory link">Adicionar</a>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+    				</th>
+    			</tr>
+    			<tr>
     				<th>
     					<span>history</span>
-						<a href="javascript:void(0);" class="addHistory" onclick="Add.history();">
-							<img src="images/history/new.gif" alt="Add" title="Add history" />
-						</a>
 					</th>
     				<th>
     					<span>todo</span>
@@ -33,25 +86,9 @@
 			<tbody></tbody>
 			<tfoot>
     			<tr>
-    				<td>
-    					<b>Inicio:</b>&nbsp;<span></span>
-						&nbsp;
-						<b>Fim:</b>&nbsp;<span></span>
-    				</td>
+    				<td></td>
     				<td colspan="2">&nbsp;</td>
-    				<td align="right">
-    					<label for="sprintSelect"><b>Sprint:</b></label>
-    					<select id="sprintSelect">
-    						<optgroup label="Sprints">
-    							<option value="">...</option>
-							</optgroup>
-						</select>
-    					<img src="images/sprint/settings.gif" class="actSprint" alt="+" title="Sprint actions" />
-						<div class="sprintOpt" style="display: none;">
-	    					<img src="images/sprint/add.gif" class="sprint addSprint" alt="+" title="Add sprint" />
-	    					<img src="images/sprint/sprint.gif" class="sprint defaultSprint" alt="*" title="Sprint default" />
-						</div>
-    				</td>
+    				<td align="right"></td>
     			</tr>
 			</tfoot>
     	</table>
@@ -66,38 +103,14 @@
 		</div>
     </body>
 	<head>
-        <script type="text/javascript" src="js/jquery.js"></script>
-        <script type="text/javascript" src="js/jquery-ui.js"></script>
+        <script type="text/javascript" src="js/jquery.1.3.min.js"></script>
+        <script type="text/javascript" src="js/jquery.ui.all.min.js"></script>
         <script type="text/javascript" src="js/script.js?<?= rand() ?>"></script>
 		<script type="text/javascript">
-			jQuery(function(){
+			$(function(){
 				$('#main > tbody > tr:odd > td').css('background-color','#F9F9F9');
-				$('#main > tfoot > tr > td:last > img.addSprint').click( Add.sprint );
 				Struts.init();
 			});
 		</script>
 	</head>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

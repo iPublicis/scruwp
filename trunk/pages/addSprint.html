@@ -1,5 +1,6 @@
 <form onsubmit="Save.sprint(); return false;">
 	<input type="hidden" name="action" value="addSprint" />
+	<input type="hidden" name="idTeam" value="" />
 	<div class="response"></div>
 
 	<label for="beginDate">Data Inicio: </label><br />
@@ -28,3 +29,10 @@
 	<input type="submit" value="Adicionar" />
 </form>
 <br />
+<script type="text/javascript">
+	$(function(){
+		$(':hidden[name=idTeam]').val(
+			$('#teamSelect').val()
+		);
+	});
+</script>

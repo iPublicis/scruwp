@@ -1,10 +1,14 @@
 var Struts = {
 	newTask: {},
 	init: function(){
+		// LOAD THE MENU ACTIONS
+		Struts.menu();
 		// LOAD ALL THE SPRINTS
-		Get.sprint();
+		Get.team();
 		// MODAL CORRECTIONS
 		Modal.initialize();
+		// EVENT CHANGE TEAM
+		Struts.team.init();
 		// EVENT CHANGE SPRINT
 		Struts.sprint.init();
 		// MESSAGES INIT
@@ -12,52 +16,107 @@ var Struts = {
 		// LOADING FROM AJAX REQUEST
 		$.ajaxSetup({
 			beforeSend: function(){
-				$('#loading').show();
+				$('#loading').fadeIn();
 			},
 			complete: function(){
-				$('#loading').hide();
+				$('#loading').fadeOut();
 			}
 		});
 	},
-	sprint: {
-		init: function(){
-			Struts.sprint.actionMenu();
-			Struts.sprint.initSelectAction();
-		},
-		actionMenu: function(){
-			$('img.addSprint').click( Add.sprint );
-			$('img.actSprint').click(function(){
-				$(this).siblings('div').toggle( 'fast' );
+	menu: function(){
+		var thOptions 	= $('th.options');
+		var spanBtn		= thOptions.children('span.button');
+
+		thOptions.children('div.container').css({
+			top: spanBtn.position().top + spanBtn.outerHeight() - 1
+		});
+
+		spanBtn.click(function(){
+			$(this).css(
+				$(this).siblings('div.container').toggle().is(':visible')
+					? { 'background-color': '#DDDDDD',
+						'border': '1px solid #000000',
+						'border-bottom': ' 1px solid #DDDDDD' }
+					: { 'border': '1px solid #000000' }
+			);
+		}).mouseover(function(){
+			if( $(this).siblings('div.container').is(':visible') )
+				return false;
+
+			$(this).css({
+				'background-color': '#DDDDDD',
+				'border': '1px solid #000000'
 			});
-			$('img.defaultSprint').click( Save.defaultSprint );
+		}).mouseout(function(){
+			if( $(this).siblings('div.container').is(':visible') )
+				return false;
+
+			$(this).css({
+				'background-color': '#FFFFFF',
+				'border': '1px solid #FFFFFF'
+			});
+		});
+
+		var menuDiv = 'div.container ';
+		// TEAM ACTIONS
+		$( menuDiv + 'a.addTeam').click( Add.team );
+		// SPRINT ACTIONS
+		$( menuDiv + 'a.addSprint').click( Add.sprint );
+		$( menuDiv + 'a.defaultSprint').click( Save.defaultSprint );
+		// HISTORY ACTIONS
+		$( menuDiv + 'a.addHistory').click( Add.history );
+	},
+	team: {
+		init: function(){
+			Struts.team.initSelectAction();
 		},
 		initSelectAction: function(){
-			$('#sprintSelect').change(function(){
-				var option = $('#sprintSelect option:selected');
+			$('#teamSelect').change(function(){
+				var action = this.value ? 'show' : 'hide';
+				$('li.sprint')[ action ]().prev('li')[ action ]();
 
-				$('a.addHistory')[ this.status ? 'show' : 'hide' ]();
-				$('img.actSprint')[ this.value ? 'show' : 'hide' ]();
-
-				$('#main > tfoot > tr > td:first')
-					.children('span:first').html( option.data('beginDate').dateToPtBr() )
-					.children('span:last' ).html( option.data('endDate').dateToPtBr() );
-
-				if( this.value ) {
-					Get.historyBySprint( this.value );
-				}
-			});
+				if( this.value )
+					Get.sprintByTeam( this.value );
+			}).change();
 		},
-		mountSelect: function( dados ){
-			var selected = false;
-			$('#sprintSelect > optgroup:first > option'+ (
+		mountSelect: function( dados,id ){
+			$('#teamSelect > optgroup:first > option'+ (
 				dados.length ? '' : ':gt(0)'
 			) ).remove();
 
-			$('a.addHistory,img.actSprint')[
-				 $('#sprintSelect').val( selected ).val() ? 'show' : 'hide'
-			]();
+			$.each(dados,function(){
+				var selected = id == this.id ? 'selected="selected"' : '';
+				$('#teamSelect > optgroup:first').append(
+					'<option value="'+ this.id +'" '+ selected +'>'+ this.name +'</option>'
+				);
+			});
 
-			$.each(dados,function(i){
+			$('#teamSelect').change();
+		}
+	},
+	sprint: {
+		init: function(){
+			Struts.sprint.initSelectAction();
+		},
+		initSelectAction: function(){
+			$('#sprintSelect').change(function(){
+				var action = this.value ? 'show' : 'hide';
+				$('li.history')[ action ]().prev('li')[ action ]();
+
+				if( this.value )
+					Get.historyBySprint( this.value );
+			}).change();
+		},
+		mountSelect: function( dados ){
+			var selected = false;
+			$('#sprintSelect > optgroup:first > option').remove();
+
+			if( !dados.length )
+				$('#sprintSelect > optgroup:first').append(
+					'<option value="">...</option>'
+				);
+
+			$.each(dados,function(){
 				if( !selected && parseInt( this.status ) ){
 					selected = this.id;
 				}
@@ -68,62 +127,55 @@ var Struts = {
 					.data( 'status',parseInt(this.status) )
 					.data( 'beginDate',this.beginDate )
 					.data( 'endDate',this.endDate );
-
-				$('a.addHistory,img.actSprint')[
-					 $('#sprintSelect').val( selected ).val() ? 'show' : 'hide'
-				]();
 			});
 
-			if( selected ){
-				Get.historyBySprint( selected );
-				var option = $('#sprintSelect option:selected');
-				$('#main > tfoot > tr > td:first')
-					.children('span:first').html( option.data('beginDate').dateToPtBr() )
-					.siblings('span:last' ).html( option.data('endDate').dateToPtBr() );
-			}
+			$('#sprintSelect').val( selected ).change();
 		}
 	},
 	history: {
 		mount: function( dados ){
 			// VERIFY IF THE SPRINT IS THE ACTIVE
-			var active = $('#sprintSelect :selected').data('status');
+			var active = $('#sprintSelect option:selected').data('status');
 
 			// MOUNT EACH HISTORY LINE
 			$.each(dados,function(h,hist){
 				$('#main > tbody').append(
 					'<tr class="history '+ hist.id +'">' +
 						'<td class="description">' +
-							( active ? '<img src="images/history/delete.gif" class="deleteHistory" alt="X" title="Delete history" />' : '' ) +
+							( active ? '<img src="images/history/delete.png" class="deleteHistory" alt="X" title="Delete history" />' : '' ) +
 							'<span>'+
 								'<sup>'+ hist.estimate +'</sup>&nbsp;'+
 								'<b>'+ hist.name +'</b>'+
 							'</span>'+
 							'<br /><i>' + hist.text + '</i>' +
 						'</td>' +
-						'<td class="box">'+ ( active ? '<img src="images/notes/new.gif" alt="+" title="1" class="addTask" />' : '' ) +'</td>' +
-						'<td class="box">'+ ( active ? '<img src="images/notes/new.gif" alt="+" title="2" class="addTask" />' : '' ) +'</td>' +
-						'<td class="box">'+ ( active ? '<img src="images/notes/new.gif" alt="+" title="3" class="addTask" />' : '' ) +'</td>' +
+						//TODO: Corrigir o title colocando o id como $.data
+						'<td class="box">'+ ( active ? '<img src="images/notes/add.png" alt="+" title="1" class="addTask" />' : '' ) +'</td>' +
+						'<td class="box">'+ ( active ? '<img src="images/notes/add.png" alt="+" title="2" class="addTask" />' : '' ) +'</td>' +
+						'<td class="box">'+ ( active ? '<img src="images/notes/add.png" alt="+" title="3" class="addTask" />' : '' ) +'</td>' +
 					'</tr>'
 				).find('tr:last').data('id',hist.id);
 
 				Get.taskByHistory( hist.id );
 			});
-			
+
 			// IF !ACTIVE DOESNT INIT THE ACTIONS
 			if( !active ) return false;
 
 			// MAKE THE HISTORY ACTIONS
-			$('#main > tbody > tr > td.description').each(function(){
+			$('td.description').each(function(){
 				// IMAGE DELETE ACTION
 				$(this).children('img.deleteHistory').click( function(){
-					var tr = $(this).parent().parent(),
-						id = tr.data('id');
-				 	Delete.history( id,tr );
+				 	Delete.history(
+						$(this).parent().parent(), tr.data('id')
+					);
 				}).hide();
+
 				// IMAGE DELETE MOUSEOVER
 				$(this).mouseover(function(){
 					$( this ).children('img.deleteHistory').show();
 				});
+
 				// IMAGE DELETE MOUSEOUT
 				$(this).mouseout(function(){
 					$( this ).children('img.deleteHistory').hide();
@@ -139,7 +191,7 @@ var Struts = {
 					drop: function(ev, ui) {
 						// PEGA OS IDS DE HISTORIA
 						var id = ui.draggable.data('history');
-						var history = ui.element.get(0).parentNode.className.split(' ')[1];
+						var history = ui.element.parent().data('id');
 
 						// CANCELA SE A HISTORIA FOR DIFERENTE
 						if( id != history )
@@ -150,10 +202,10 @@ var Struts = {
 
 						if( window.statusJSON ){
 							// INSERE A TASK NA TABELA
-							$(this).append($(ui.helper[0]).css({
-								'top': 0,
-								'left': 0
-							}));
+							$(this).append( ui.helper.css({
+								'top':'0px',
+								'left':'0px'
+							}) );
 						}
 
 						// RETURN THE STATUS
@@ -183,7 +235,7 @@ var Struts = {
 	},
 	task: {
 		mount: function( dados ){
-			var active = $('#sprintSelect :selected').data('status');
+			var active = $('#sprintSelect option:selected').data('status');
 
 			$.each( dados,function(){
 				var tds = $('#main > tbody > tr.'+ this.idHistory +' > td:eq('+ this.idStatus +')')
@@ -191,7 +243,7 @@ var Struts = {
 						'<span class="dragBox" style="background-color:#'+ this.color +'">' +
 							'<span class="text">' + this.text + '</span>' +
 							'<span class="name">' + this.name + '</span>' +
-							( active ? '<img src="images/notes/delete.gif" class="deleteTask" alt="X" title="Delete task" />' : '' ) +
+							( active ? '<img src="images/notes/delete.png" class="deleteTask" alt="X" title="Delete task" />' : '' ) +
 						'</span>' )
 					.find('span.dragBox:last')
 					.data( 'history',this.idHistory )
@@ -201,18 +253,23 @@ var Struts = {
 					.children('img.deleteTask').hide();
 			});
 
-			if( !active )
-				return false;
+			// VERIFICA SE PRECISA MONTAR AS ACOES DAS TASKS
+			if( !active ) return false;
 
-			$('#main > tbody > tr > td:gt(0) > span.dragBox').each(function(){
+			$('span.dragBox').each(function(){
 				var span = $(this);
 				span.draggable({
-					containment: 'window',
-					grid: [10, 10],
+					zIndex: 666,
 					opacity: 0.7,
 					revert: true,
-					zIndex: 666,
-					cursor: 'move'
+					cursor: 'move',
+					grid: [10, 10],
+					stop:function(e,ui){
+						ui.helper.css({
+							'top':'0px',
+							'left':'0px'
+						});
+					}
 				}).mouseover(function(){
 					$( this ).children('img.deleteTask').show();
 				}).mouseout(function(){
@@ -228,6 +285,11 @@ var Struts = {
 };
 
 var Add = {
+	team: function(){
+		Modal.load(
+			'pages/addTeam.html','Add team'
+		);
+	},
 	sprint: function(){
 		Modal.load(
 			'pages/addSprint.html','Add sprint'
@@ -241,9 +303,9 @@ var Add = {
 	task: function(){
 		Modal.load(
 			'pages/addTask.html','Add Task',function(){
-				$('#content > div.main')
+				$('div.main')
 					.find('select').val( Struts.newTask.status ).parent()
-					.find(':hidden[name=history]').val( Struts.newTask.history );
+					.find('input:hidden[name=history]').val( Struts.newTask.history );
 			}
 		);
 	}
@@ -255,21 +317,38 @@ var Get = {
 			$.isFunction( callBack ) ? callBack : function(){}
 		);
 	},
-	sprint: function(){
+	team: function( id ){
 		$.ajax({
 			cache: false,
 			method: 'POST',
 			dataType: 'json',
 			url: 'includes/ajax.php',
-			data: ( 'action=getSprint' ),
+			data: ( 'action=getTeam' ),
 			success: function( json ){
-				if( json.count && json.count > 0 ){
-					Struts.sprint.mountSelect( json.data );
-				}
+				Struts.team.mountSelect( json.data || [], id );
+			}
+		});
+	},
+	sprintByTeam: function( id ){
+		$('#main > tbody > tr').remove();
+
+		if( !id )
+			return false;
+
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: ( 'action=getSprintByTeam&id=' + id ),
+			success: function( json ){
+				Struts.sprint.mountSelect( json.data || [] );
 			}
 		});
 	},
 	historyBySprint: function( id ){
+		$('#main > tbody > tr').remove();
+
 		if( !id )
 			return false;
 
@@ -280,10 +359,7 @@ var Get = {
 			url: 'includes/ajax.php',
 			data: ( 'action=getHistoryBySprint&id=' + id ),
 			success: function( json ){
-				$('#main > tbody > tr').remove();
-				if( json.count && json.count > 0 ){
-					Struts.history.mount( json.data );
-				}
+				Struts.history.mount( json.data || [] );
 			}
 		});
 	},
@@ -298,9 +374,7 @@ var Get = {
 			url: 'includes/ajax.php',
 			data: ( 'action=getHistory&id=' + id ),
 			success: function( json ){
-				if( json.count && json.count > 0 ){
-					Struts.history.mount( json.data );
-				}
+				Struts.history.mount( json.data || [] );
 			}
 		});
 	},
@@ -315,9 +389,7 @@ var Get = {
 			url: 'includes/ajax.php',
 			data: ( 'action=getTask&id=' + id ),
 			success: function( json ){
-				if( json.count && json.count > 0 ){
-					Struts.task.mount( json.data );
-				}
+				Struts.task.mount( json.data || [] );
 			}
 		});
 	},
@@ -332,15 +404,31 @@ var Get = {
 			url: 'includes/ajax.php',
 			data: ( 'action=getTaskByHistory&id=' + id ),
 			success: function( json ){
-				if( json.count && json.count > 0 ){
-					Struts.task.mount( json.data );
-				}
+				Struts.task.mount( json.data || [] );
 			}
 		});
 	}
 };
 
 var Save = {
+	team: function(){
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: $('#content :input').serialize(),
+			success: function( json ){
+				if( json.code == 0 ){
+					Modal.close(function(){
+						Get.team( json.id );
+					});
+				} else {
+					$('div.response').addClass('error').html( json.message );
+				}
+			}
+		});
+	},
 	sprint: function(){
 		$.ajax({
 			cache: false,
@@ -349,10 +437,13 @@ var Save = {
 			url: 'includes/ajax.php',
 			data: $('#content :input').serialize(),
 			success: function( json ){
-				if( !json.code )
+				if( json.code == 0 ){
 					Modal.close(function(){
-						Get.sprint();
+						Get.sprintByTeam( $('#teamSelect').val() );
 					});
+				} else {
+					$('div.response').addClass('error').html( json.message );
+				}
 			}
 		});
 	},
@@ -364,9 +455,8 @@ var Save = {
 			url: 'includes/ajax.php',
 			data: $('#content :input').serialize(),
 			success: function( json ){
-				var div = $('#content > div.main div.response');
 				if( json.code == 0 ){
-					div.addClass('success').html( json.message );
+					$('div.response').addClass('success').html( json.message );
 					Modal.close(function(){
 						Get.history( json.id );
 					});
@@ -383,9 +473,8 @@ var Save = {
 			url: 'includes/ajax.php',
 			data: $('#content :input').serialize(),
 			success: function( json ){
-				var div = $('#content > div.main div.response');
 				if( json.code == 0 ){
-					div.addClass('success').html( json.message );
+					$('div.response').addClass('success').html( json.message );
 					Modal.close(function(){
 						Get.task( json.id );
 					});
@@ -421,8 +510,10 @@ var Save = {
 
 		return self.statusJSON;
 	},
-	defaultSprint: function( id ){
-		var selected = $('#sprintSelect :selected');
+	defaultSprint: function(){
+		var selected = $('#sprintSelect option:selected');
+		if( !selected.val() )
+			return false;
 
 		if( parseInt( selected.data('status') ) ){
 			Show.info( 'O Sprint <b>'+ selected.html() +'</b> já é o atual!' );
@@ -436,13 +527,10 @@ var Save = {
 			url: 'includes/ajax.php',
 			data: 'action=defaultSprint&id='+ selected.val(),
 			success: function( json ){
-				$('#main > tfoot > tr > td:last > div').hide();
+				Show[ json.code == 0 ? 'success' : 'error' ]( json.message );
 				if( json.code == 0 ){
-					Show.success( json.message );
-					Get.sprint();
-				} else {
-					Show.error( json.message );
-				}
+					Get.sprintByTeam( $('#teamSelect').val() );
+				}	
 			}
 		});
 		return false;
@@ -468,7 +556,7 @@ var Delete = {
 		return false;
 	},
 	task: function( id,task ){
-		if( prompt( 'Deseja remover a task?' ) ){
+		if( confirm( 'Deseja remover a task?' ) ){
 			$.ajax({
 				cache: false,
 				method: 'POST',
@@ -491,7 +579,7 @@ var Show = {
 		// CONTAINER FOR MESSAGES
 		Show.container = $('#main > tfoot > tr > td').eq(1);
 		// CLEAR THE CONTAINER MESSAGE
-		Show.container.click(function(){ Show.clear(); });
+		Show.container.click( Show.clear );
 	},
 	info: function( msg ){
 		this.message( msg,'info' );
@@ -507,11 +595,12 @@ var Show = {
 		this.container.html( msg ).addClass( css ).addClass( 'pointer' );
 	},
 	clear: function(){
-		this.container.empty().removeClass();
+		Show.container.empty().removeClass();
 	}
 };
 
 var Modal = {
+	//TODO: Fazer o window.rezise com o Modal
 	initialize: function(){
 		$('#content > a.close').click( Modal.close );
 	},
@@ -521,8 +610,8 @@ var Modal = {
 		});
 	},
 	load: function( url,title,callBack ){
-		var content = $('#content > div.main');
-		$('#content > span.header').html( title || '' );
+		var content = $('div.main');
+		$('span.header').html( title || '' );
 		this.open();
 
 		$.ajax({
@@ -548,7 +637,7 @@ var Modal = {
 	},
 	close: function( callBack ){
 		$('#content').fadeOut( 'fast',function(){
-			$('#content > div.main').empty();
+			$('div.main').empty();
 			$('#backGround').fadeOut( 'fast',function(){
 				if( $.isFunction( callBack ) ){
 					callBack();
@@ -578,7 +667,7 @@ function printError(cod,message,sql){
 }
 
 function loading( remove ){
-	var content = $( '#content > div.main' );
+	var content = $( 'div.main' );
 	if( remove ){
 		content.find('div.loading').remove();
 	} else {

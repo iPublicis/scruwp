@@ -1,213 +1,289 @@
-html,body {
-	width: 100%;
-	height: 100%;
-	margin: 0px;
-	padding: 0px;
-	font: 16px Tahoma;
-	text-align: left;
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    font: 16px Tahoma;
+    text-align: left;
 }
 /* HEADER */
 div#header h1 {
-	margin: 0px 5px;
+    margin: 0px 5px;
 }
+
 /* LOADING */
 div#loading {
-	padding: 3px;
-	position: absolute;
-	top: 0px;
-	right: 0px;
+    padding: 3px;
+    position: absolute;
+    top: 0px;
+    right: 50%;
 }
+
 /* TABLE */
 table#main thead th {
 	padding: 3px;
 	background-color: #EEEEEE;
 	border-bottom: 1px solid #CCCCCC;
 }
+
 table#main thead th span {
-	text-transform: uppercase;
-	float: left;
+    text-transform: uppercase;
+    float: left;
 }
-table#main thead th img {
-	position: relative;
-	float: right;
-	right: 2px;
-	top: 2px;
+
+table#main thead th.options {
+	text-align: right;
+	padding: 2px;
 }
-table#main th,
+
+table#main thead th.options span.button {
+	background: url('../images/settings.png') no-repeat 2px 4px;
+	padding: 2px 2px 2px 20px;
+	border: 1px solid #FFFFFF;
+	position: absolute;
+	cursor: pointer;
+	right: 6px;
+	z-index: 2;
+	top: 6px;
+}
+
+table#main thead th.options div.container {
+	background-color: #DDDDDD;
+	border: 1px solid #000000;
+	position: absolute;
+	padding: 2px;
+	right: 6px;
+	z-index: 1;
+}
+
+table#main thead th.options div.container ul {
+	text-align: left;
+	list-style: none;
+	padding: 2px;
+	margin: 0px;
+}
+
+table#main thead th.options div.container ul li ul li {
+	margin-left: 10px;
+}
+
+table#main thead th.options div.container a.link {
+	padding: 2px 2px 2px 20px;
+	font-size: 14px;
+}
+
+table#main thead th.options div.container ul li a.addSprint {
+	background: url('../images/sprint/add.png') no-repeat 2px 3px;
+}
+
+table#main thead th.options div.container ul li a.defaultSprint {
+	background: url('../images/sprint/link.png') no-repeat 2px 3px;
+}
+
+table#main thead th.options div.container ul li a.addTeam {
+	background: url('../images/team/add.png') no-repeat 2px 3px;
+}
+
+table#main thead th.options div.container ul li a.addHistory {
+	background: url('../images/history/add.png') no-repeat 2px 4px;
+}
+
+table#main thead th,
 table#main tbody td {
-	width: 25%;
-	background-color: #EEEEEE;
+    width: 25%;
+    background-color: #EEEEEE;
 }
 table#main tbody tr.history td {
-	padding: 5px;
-	vertical-align: top;
-	border-bottom: 1px solid #CCCCCC;
+    padding: 5px;
+    vertical-align: top;
+    border-bottom: 1px solid #CCCCCC;
 }
+
 table#main tbody tr img.deleteHistory {
-	cursor: pointer;
-	float: right;
+    cursor: pointer;
+    float: right;
 }
+
 table#main tbody tr td.box {
-	vertical-align: top;
-	border-left: 1px solid #CCCCCC;
+    vertical-align: top;
+    border-left: 1px solid #CCCCCC;
 }
+
 table#main tbody tr td.box img.addTask {
-	float: right;
-	cursor: pointer;
+    float: right;
+    cursor: pointer;
 }
+
 table#main tbody tr td.hoverBox {
-	border: 1px solid #CCCCCC;
-	background-color: #DDDDDD;
+    border: 1px solid #CCCCCC;
+    background-color: #DDDDDD;
 }
+
 table#main tfoot td {
-	padding: 3px;
-	vertical-align: top;
+    padding: 3px;
+    vertical-align: top;
 }
 table#main tfoot input,
 table#main tfoot textarea {
-	margin-left: 5%;
-	width: 90%;
+    margin-left: 5%;
+    width: 90%;
 }
+
 table#main tfoot td img.sprint {
-	cursor: pointer;
-	padding: 3px;
+    cursor: pointer;
+    padding: 3px;
 }
+
 table#main tfoot td img.actSprint {
-	position: relative;
-	margin-left: 3px;
-	cursor: pointer;
-	right: 3px;
-	top: 3px;
+    position: relative;
+    margin-left: 3px;
+    cursor: pointer;
+    right: 3px;
+    top: 3px;
 }
+
 table#main tfoot td div.sprintOpt {
-	position: absolute;
-	right: 0px;
+    position: absolute;
+    right: 0px;
 }
+
 /* DRAGGABLE */
 span.dragBox {
-	width: 80px;
-	height: 70px;
-	margin: 5px 0 0 5px;
-	padding: 3px;
-	cursor: pointer;
-	font-size: 10px;
-	display: inline-block;
+    width: 80px;
+    height: 70px;
+    margin: 5px 0 0 5px;
+    padding: 3px;
+    cursor: pointer;
+    font-size: 10px;
+    display: inline-block;
 }
+
 span.dragBox img.deleteTask {
-	position: absolute;
-	cursor: pointer;
-	right: 2px;
-	top: 2px;
+    position: absolute;
+    cursor: pointer;
+    right: 2px;
+    top: 2px;
 }
 span.dragBox span.text,
 span.dragBox span.name {
-	width: 100%;
-	display: inline-block;
+    width: 100%;
+    display: inline-block;
 }
+
 span.dragBox span.text {
-	height: 55px;
-	overflow: hidden;
+    height: 55px;
+    overflow: hidden;
 }
+
 span.dragBox span.name {
-	font-size: 7px;
+    font-size: 7px;
 }
+
 /* MODAL LAYOUT */
 div#backGround {
-	z-index: 333;
-	background-color: #000000;
-	position: absolute;
-	height: 100%;
-	width: 100%;
-	opacity: .5;
-	left: 0px;
-	top: 0px;
+    z-index: 333;
+    background-color: #000000;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    opacity: .5;
+    left: 0px;
+    top: 0px;
 }
+
 div#content {
-	background-color: #CCCCCC;
-	border: 1px solid #000000;
-	height: 50%;
-	left: 25%;
-	padding-top: 36px;
-	position: absolute;
-	top: 25%;
-	width: 50%;
-	z-index: 666;
+    background-color: #CCCCCC;
+    border: 1px solid #000000;
+    height: 50%;
+    left: 25%;
+    padding-top: 36px;
+    position: absolute;
+    top: 25%;
+    width: 50%;
+    z-index: 666;
 }
+
 div#content div.main {
-	background-color: #FFFFFF;
-	border-top: 1px solid #000000;
-	border-bottom: 1px solid #000000;
-	height: 100%;
-	overflow-y: auto;
-	padding: 0 2%;
-	width: 96%;
+    background-color: #FFFFFF;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0 2%;
+    width: 96%;
 }
+
 div#content div.main div.response {
-	margin-bottom: 10px;
-	padding: 5px;
+    margin-bottom: 10px;
+    padding: 5px;
 }
+
 div#content span.header {
-	width: 90%;
-	overflow: hidden;
-	line-height: 18px;
-	font-size: 16px;
-	position: absolute;
-	font-weight: bold;
-	top: 10px;
-	left: 10px;
+    width: 90%;
+    overflow: hidden;
+    line-height: 18px;
+    font-size: 16px;
+    position: absolute;
+    font-weight: bold;
+    top: 10px;
+    left: 10px;
 }
+
 div#content a.close {
-	line-height: 16px;
-	font-size: 16px;
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	padding-left: 18px;
-	background: url('../images/refresh.gif') no-repeat;
+    line-height: 16px;
+    font-size: 16px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding-left: 18px;
+    background: url('../images/refresh.gif') no-repeat;
 }
+
 div#content label {
-	font-weight: bold;
+    font-weight: bold;
 }
 div#content input,
 div#content select,
 div#content textarea {
-	font-size: 17px;
-	width: 100%;
-}
-/* CLASSES */
-.loading {
-	padding-left: 18px;
-	background: url('../images/loading.gif') no-repeat;
-}
-.pointer {
-	cursor: pointer;
-}
-.left {
-	float: left;
-}
-.right {
-	float: right;
+    font-size: 17px;
+    width: 100%;
 }
 
+/* CLASSES */
+.loading {
+    padding-left: 18px;
+    background: url('../images/loading.gif') no-repeat;
+}
+.pointer {
+    cursor: pointer;
+}
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}
 .error {
-	color: #660000;
-	background-color: #FF9999;
-	border: 1px solid #330000;
+    color: #660000;
+    background-color: #FF9999;
+    border: 1px solid #330000;
 }
 .info {
-	color: #000099;
-	background-color: #9999FF;
-	border: 1px solid #000033;
+    color: #000099;
+    background-color: #9999FF;
+    border: 1px solid #000033;
 }
 .success {
-	color: #006600;
-	background-color: #99FF99;
-	border: 1px solid #003300;
+    color: #006600;
+    background-color: #99FF99;
+    border: 1px solid #003300;
 }
+
 /* GENERAL */
 img {
-	border: 0px none;
+    border: 0px none;
 }
+
 a {
-	text-decoration: none;
+    text-decoration: none;
 }
