@@ -6,10 +6,14 @@ header('Content-type: text/json;');
 $conn = connect();
 
 switch( $_REQUEST['action'] ){
+	// TEAM
+	case 'addTeam': addTeam(); break;
+	case 'getTeam': getTeam(); break;
 	// SPRINT
 	case 'addSprint': addSprint(); break;
 	case 'getSprint': getSprint(); break;
 	case 'defaultSprint': defaultSprint(); break;
+	case 'getSprintByTeam': getSprintByTeam(); break;
 	// HISTORY
 	case 'addHistory': addHistory(); break;
 	case 'getHistory': getHistory(); break;
@@ -26,6 +30,33 @@ switch( $_REQUEST['action'] ){
 	default: blank();
 }
 
+// TEAM
+
+function addTeam(){
+	$return = insert(
+		'teams', array( 'name' ),
+		array( $_REQUEST['name'] )
+	);
+
+	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',(
+		$return['code'] ? 'error' : 'Ok!'
+	),'" }';
+}
+
+function getTeam(){
+	$return = getJSON(
+		'teams', array( '*' )
+	);
+
+	if( is_array( $return ) ){
+		echo '{ code: ', $return['code'], ', message: "',sanitize( $return['message'] ),(
+			$return['query'] ? '", query: "'.$return['query'] : ''
+		),'" }';
+	} else {
+		echo $return;
+	}
+}
+
 // SPRINT
 
 //TODO: Adicionar transacao
@@ -33,7 +64,9 @@ function addSprint(){
 	$update['status'] = true;
 
 	if( $_REQUEST['status'] )
-		$update = update( 'sprints',array( 'status' => 0 ) );
+		$update = update( 'sprints',
+			array( 'status' => 0 ), array( 'idTeam = '.$_REQUEST['idTeam'] )
+		);
 
 	if( $update['status'] ){
 		$endDate = date( 'Y-m-d',(
@@ -41,14 +74,13 @@ function addSprint(){
 		) );
 
 		$return = insert(
-			'sprints', array( 'status','beginDate','endDate' ),
-			array( $_REQUEST['status'],toMysql($_REQUEST['beginDate']),$endDate )
+			'sprints', array( 'idTeam','status','beginDate','endDate' ),
+			array( $_REQUEST['idTeam'],$_REQUEST['status'],toMysql($_REQUEST['beginDate']),$endDate )
 		);
 	} else {
 		$return = array(
 			'id' => 0,
-			'code' => 1,
-			'message' => 'error'
+			'code' => 1
 		);
 	}
 
@@ -59,7 +91,7 @@ function addSprint(){
 
 function getSprint(){
 	$return = getJSON(
-		'sprints', array( '*' )
+		'sprints', array( '*' ), array( 'idTeam = '.$_REQUEST['idTeam'] )
 	);
 
 	if( is_array( $return ) ){
@@ -88,6 +120,20 @@ function defaultSprint(){
 	}
 
 	echo '{ code: ', $return['code'] ,', message: "',( $return['code'] ? 'error' : 'Ok!' ),'" }';
+}
+
+function getSprintByTeam(){
+	$return = getJSON(
+		'sprints', array( '*' ), array( 'idTeam = '.$_REQUEST['id'] )
+	);
+
+	if( is_array( $return ) ){
+		echo '{ code: ', $return['code'], ', message: "',sanitize( $return['message'] ),(
+			$return['query'] ? '", query: "'.$return['query'] : ''
+		),'" }';
+	} else {
+		echo $return;
+	}
 }
 
 // HISTORY
