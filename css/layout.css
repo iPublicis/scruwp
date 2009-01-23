@@ -61,17 +61,27 @@ table#main tbody tr td.hoverBox {
 }
 table#main tfoot td {
 	padding: 3px;
+	vertical-align: top;
 }
 table#main tfoot input,
 table#main tfoot textarea {
 	margin-left: 5%;
 	width: 90%;
 }
-table#main tfoot td img.addSprint {
-	position: relative;
-	margin-right: 3px;
+table#main tfoot td img.sprint {
 	cursor: pointer;
-	top: 2px;
+	padding: 3px;
+}
+table#main tfoot td img.actSprint {
+	position: relative;
+	margin-left: 3px;
+	cursor: pointer;
+	right: 3px;
+	top: 3px;
+}
+table#main tfoot td div.sprintOpt {
+	position: absolute;
+	right: 0px;
 }
 /* DRAGGABLE */
 span.dragBox {
@@ -169,21 +179,30 @@ div#content textarea {
 	padding-left: 18px;
 	background: url('../images/loading.gif') no-repeat;
 }
+.pointer {
+	cursor: pointer;
+}
 .left {
 	float: left;
 }
 .right {
 	float: right;
 }
+
 .error {
-	color: #FF0000;
+	color: #660000;
 	background-color: #FF9999;
-	border: 1px solid #660000;
+	border: 1px solid #330000;
+}
+.info {
+	color: #000099;
+	background-color: #9999FF;
+	border: 1px solid #000033;
 }
 .success {
-	color: #00FF00;
+	color: #006600;
 	background-color: #99FF99;
-	border: 1px solid #006600;
+	border: 1px solid #003300;
 }
 /* GENERAL */
 img {

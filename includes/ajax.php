@@ -9,6 +9,7 @@ switch( $_REQUEST['action'] ){
 	// SPRINT
 	case 'addSprint': addSprint(); break;
 	case 'getSprint': getSprint(); break;
+	case 'defaultSprint': defaultSprint(); break;
 	// HISTORY
 	case 'addHistory': addHistory(); break;
 	case 'getHistory': getHistory(); break;
@@ -27,11 +28,29 @@ switch( $_REQUEST['action'] ){
 
 // SPRINT
 
+//TODO: Adicionar transacao
 function addSprint(){
-	$return = insert(
-		'sprints', array( 'status','beginDate','endDate' ),
-		array( $_REQUEST['status'],toMysql($_REQUEST['beginDate']),toMysql($_REQUEST['endDate']) )
-	);
+	$update['status'] = true;
+
+	if( $_REQUEST['status'] )
+		$update = update( 'sprints',array( 'status' => 0 ) );
+
+	if( $update['status'] ){
+		$endDate = date( 'Y-m-d',(
+			strtotime( toMysql($_REQUEST['beginDate']) ) + ( 604800 * $_REQUEST['duration'] )
+		) );
+
+		$return = insert(
+			'sprints', array( 'status','beginDate','endDate' ),
+			array( $_REQUEST['status'],toMysql($_REQUEST['beginDate']),$endDate )
+		);
+	} else {
+		$return = array(
+			'id' => 0,
+			'code' => 1,
+			'message' => 'error'
+		);
+	}
 
 	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',(
 		$return['code'] ? 'error' : 'Ok!'
@@ -50,6 +69,25 @@ function getSprint(){
 	} else {
 		echo $return;
 	}
+}
+
+//TODO: Adicionar transacao
+function defaultSprint(){
+	$update['status'] = false;
+	$update = update( 'sprints',array( 'status' => 0 ) );
+
+	if( $update['status'] ){
+		$return = update(
+			'sprints',array( 'status' => 1 ),array( 'id = '.$_REQUEST['id'] )
+		);
+	} else {
+		$return = array(
+			'code' => 1,
+			'message' => 'error'
+		);
+	}
+
+	echo '{ code: ', $return['code'] ,', message: "',( $return['code'] ? 'error' : 'Ok!' ),'" }';
 }
 
 // HISTORY
