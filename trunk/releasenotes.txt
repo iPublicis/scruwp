@@ -1,3 +1,6 @@
+Version 0.2.2:
+	* Added the favicon icon;
+
 Version 0.2.1;
 	* Added Estimate in history data;
 	* Added color to add/get tasks;
