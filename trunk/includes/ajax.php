@@ -91,7 +91,7 @@ function addSprint(){
 
 function getSprint(){
 	$return = getJSON(
-		'sprints', array( '*' ), array( 'idTeam = '.$_REQUEST['idTeam'] )
+		'sprints', array( '*' ), array( 'id = '.$_REQUEST['id'] )
 	);
 
 	if( is_array( $return ) ){

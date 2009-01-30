@@ -6,6 +6,7 @@ html, body {
     font: 16px Tahoma;
     text-align: left;
 }
+
 /* HEADER */
 div#header h1 {
     margin: 0px 5px;
@@ -19,6 +20,71 @@ div#loading {
     right: 50%;
 }
 
+/* PROGRESSBAR */
+div#progressbar {
+	width: 100%;
+	height: 15px;
+}
+
+/* OPTIONS MENU */
+div#options {
+	text-align: right;
+	padding: 2px;
+}
+
+div#options span.button {
+	background: url('../images/settings.png') no-repeat 2px 4px;
+	padding: 2px 2px 2px 20px;
+	border: 1px solid #FFFFFF;
+	position: absolute;
+	font-weight: bold;
+	cursor: pointer;
+	right: 6px;
+	z-index: 2;
+	top: 6px;
+}
+
+div#options div.container {
+	background-color: #DDDDDD;
+	border: 1px solid #000000;
+	position: absolute;
+	padding: 2px;
+	right: 6px;
+	z-index: 1;
+}
+
+div#options div.container ul {
+	text-align: left;
+	list-style: none;
+	padding: 2px;
+	margin: 0px;
+}
+
+div#options div.container ul li ul li {
+	margin-left: 10px;
+}
+
+div#options div.container a.link {
+	padding: 2px 2px 2px 20px;
+	font-size: 14px;
+}
+
+div#options div.container ul li a.addSprint {
+	background: url('../images/sprint/add.png') no-repeat 2px 3px;
+}
+
+div#options div.container ul li a.defaultSprint {
+	background: url('../images/sprint/link.png') no-repeat 2px 3px;
+}
+
+div#options div.container ul li a.addTeam {
+	background: url('../images/team/add.png') no-repeat 2px 3px;
+}
+
+div#options div.container ul li a.addHistory {
+	background: url('../images/history/add.png') no-repeat 2px 4px;
+}
+
 /* TABLE */
 table#main thead th {
 	padding: 3px;
@@ -28,64 +94,19 @@ table#main thead th {
 
 table#main thead th span {
     text-transform: uppercase;
-    float: left;
 }
 
-table#main thead th.options {
+table#main thead th.begin {
 	text-align: right;
-	padding: 2px;
 }
 
-table#main thead th.options span.button {
-	background: url('../images/settings.png') no-repeat 2px 4px;
-	padding: 2px 2px 2px 20px;
-	border: 1px solid #FFFFFF;
-	position: absolute;
-	cursor: pointer;
-	right: 6px;
-	z-index: 2;
-	top: 6px;
-}
-
-table#main thead th.options div.container {
-	background-color: #DDDDDD;
-	border: 1px solid #000000;
-	position: absolute;
-	padding: 2px;
-	right: 6px;
-	z-index: 1;
-}
-
-table#main thead th.options div.container ul {
+table#main thead th.end {
 	text-align: left;
-	list-style: none;
-	padding: 2px;
-	margin: 0px;
 }
 
-table#main thead th.options div.container ul li ul li {
-	margin-left: 10px;
-}
-
-table#main thead th.options div.container a.link {
-	padding: 2px 2px 2px 20px;
-	font-size: 14px;
-}
-
-table#main thead th.options div.container ul li a.addSprint {
-	background: url('../images/sprint/add.png') no-repeat 2px 3px;
-}
-
-table#main thead th.options div.container ul li a.defaultSprint {
-	background: url('../images/sprint/link.png') no-repeat 2px 3px;
-}
-
-table#main thead th.options div.container ul li a.addTeam {
-	background: url('../images/team/add.png') no-repeat 2px 3px;
-}
-
-table#main thead th.options div.container ul li a.addHistory {
-	background: url('../images/history/add.png') no-repeat 2px 4px;
+table#main thead th.end,
+table#main thead th.begin {
+	font-size: 13px;
 }
 
 table#main thead th,
@@ -93,13 +114,20 @@ table#main tbody td {
     width: 25%;
     background-color: #EEEEEE;
 }
+
+table#main thead #colapseAll {
+	cursor: pointer;
+	float: right;
+}
+
 table#main tbody tr.history td {
     padding: 5px;
     vertical-align: top;
     border-bottom: 1px solid #CCCCCC;
 }
 
-table#main tbody tr img.deleteHistory {
+table#main tbody tr td.description img.deleteHistory,
+table#main tbody tr td.description img.colapseHistory {
     cursor: pointer;
     float: right;
 }
@@ -123,6 +151,7 @@ table#main tfoot td {
     padding: 3px;
     vertical-align: top;
 }
+
 table#main tfoot input,
 table#main tfoot textarea {
     margin-left: 5%;
@@ -153,9 +182,12 @@ span.dragBox {
     height: 70px;
     margin: 5px 0 0 5px;
     padding: 3px;
-    cursor: pointer;
     font-size: 10px;
     display: inline-block;
+}
+
+span.ui-draggable {
+    cursor: pointer;
 }
 
 span.dragBox img.deleteTask {
@@ -164,6 +196,7 @@ span.dragBox img.deleteTask {
     right: 2px;
     top: 2px;
 }
+
 span.dragBox span.text,
 span.dragBox span.name {
     width: 100%;
@@ -242,6 +275,7 @@ div#content a.close {
 div#content label {
     font-weight: bold;
 }
+
 div#content input,
 div#content select,
 div#content textarea {
@@ -283,7 +317,6 @@ div#content textarea {
 img {
     border: 0px none;
 }
-
 a {
     text-decoration: none;
 }
