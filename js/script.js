@@ -1,5 +1,4 @@
 var Struts = {
-	newTask: {},
 	init: function(){
 		// LOAD THE MENU ACTIONS
 		Struts.menu();
@@ -7,12 +6,16 @@ var Struts = {
 		Get.team();
 		// MODAL CORRECTIONS
 		Modal.initialize();
-		// EVENT CHANGE TEAM
-		Struts.team.init();
 		// EVENT CHANGE SPRINT
 		Struts.sprint.init();
 		// MESSAGES INIT
 		Show.init();
+		// EVENT CHANGE TEAM
+		Struts.team.init();
+		// LOAD PROGRESSBAR
+		Struts.sprintBar.init();
+		// LOAD ALL LIVE EVENTS
+		Struts.initLiveEvents();
 		// LOADING FROM AJAX REQUEST
 		$.ajaxSetup({
 			beforeSend: function(){
@@ -20,11 +23,113 @@ var Struts = {
 			},
 			complete: function(){
 				$('#loading').fadeOut();
+				Show.clear();
 			}
 		});
+		// COLAPSE ALL HISTORIES
+		$('#colapseAll').click(function(){
+			$('span.dragBox')[
+				$('span.dragBox:visible').size() ? 'hide' : 'show'
+			]();
+		});
+	},
+	initLiveEvents: function(){
+		// COLAPSE HISTORY
+		$('img.colapseHistory').live('click',function(){
+			$(this).parent().parent().find('span.dragBox').toggle();
+		});
+
+		// DELETE HISTORY
+		$('img.deleteHistory').live('click',function(){
+		 	Delete.history(
+				$(this).parent().parent(), tr.data('id')
+			);
+		});
+
+		// HISTORY IMAGES MOUSE EVENTS
+		$('td.description').live('mouseover',function(){
+			$( this ).children('img').show();
+		}).live('mouseout',function(){
+			$( this ).children('img').hide();
+		});
+
+		// IMAGE ADD TASK
+		$('img.addTask').live('click',function(){
+		 	Struts.task.data = {
+				history: $(this).parent().parent().data('id'),
+				status: $(this).data('status')
+			};
+			Add.task();
+		});
+
+		// TASK ADD MOUSE EVENTS
+		$('td.box').live('mouseover',function(){
+			$(this).children('img.addTask').show();
+		}).live('mouseout',function(){
+			$(this).children('img.addTask').hide();
+		});
+
+		// TASK IMAGES MOUSE EVENTS
+		$('span.dragBox').live('mouseover',function(){
+			$(this).children('img.deleteTask').show();
+		}).live('mouseout',function(){
+			$(this).children('img.deleteTask').hide();
+		});		
+
+		// DELETE TASK
+		$('img.deleteTask').live('click',function(){
+			Delete.task(
+				$(this).parent().data('task'), $(this).parent()
+			);
+		});
+	},
+	sprintBar: {
+		init: function(){
+			$("#progressbar").progressbar().progressbar('disable');
+		},
+		setSprintValue: function(){
+			var idSprint = $('#sprintSelect').val();
+			$.get('includes/ajax.php',( 'action=getSprint&id='+ idSprint ),function(json){
+				var tHead = $('#main > thead > tr:first > th');
+
+				tHead.eq(0).html( json.data[0].beginDate.dateToPtBr() );
+				tHead.eq(2).html( json.data[0].endDate.dateToPtBr() );
+
+				$("#progressbar").progressbar(
+					'value',Struts.sprintBar.calcDiff(
+						json.data[0].beginDate, json.data[0].endDate
+					)
+				).progressbar('enable');
+			},'json');
+		},
+		calcDiff: function(d1,d2){
+			if( d1.split('-').length != 3 || d2.split('-').length != 3 )
+				return 0;
+
+			var dt1 = d1.split('-'),
+				dt2 = d2.split('-'),
+
+				date  =	new Date(),
+				date1 = new Date( dt1[0],dt1[1]-1,dt1[2] ),
+				date2 = new Date( dt2[0],dt2[1]-1,dt2[2] );
+
+			if( date1.isGreater( date2 ) )
+				return Struts.sprintBar.calcDiff( d2, d1 );
+
+			if( date.isGreater( date2 ) )
+				return 100;
+
+			if( date.isLesser( date1 ) )
+				return 0;
+
+			var posit = date - date1,
+				total = date2 - date1;
+
+			return parseInt( ( posit * 100 ) / total );
+		}
 	},
 	menu: function(){
-		var thOptions 	= $('th.options');
+		var thOptions 	= $('#options');
 		var spanBtn		= thOptions.children('span.button');
 
 		thOptions.children('div.container').css({
@@ -75,8 +180,12 @@ var Struts = {
 				var action = this.value ? 'show' : 'hide';
 				$('li.sprint')[ action ]().prev('li')[ action ]();
 
-				if( this.value )
+				if( this.value ){
+					$.cookie('teamSelect',this.value,
+						{ expires: 365, secure: true }
+					);
 					Get.sprintByTeam( this.value );
+				}
 			}).change();
 		},
 		mountSelect: function( dados,id ){
@@ -85,11 +194,15 @@ var Struts = {
 			) ).remove();
 
 			$.each(dados,function(){
-				var selected = id == this.id ? 'selected="selected"' : '';
+				var selected = $.cookie('teamSelect') == this.id ? 'selected="selected"' : '';
 				$('#teamSelect > optgroup:first').append(
 					'<option value="'+ this.id +'" '+ selected +'>'+ this.name +'</option>'
 				);
 			});
+
+			if( Struts.progressBar == false )
+				// LOAD THE PROGRESSBAR
+				Struts.sprintBar.init();
 
 			$('#teamSelect').change();
 		}
@@ -103,9 +216,11 @@ var Struts = {
 				var action = this.value ? 'show' : 'hide';
 				$('li.history')[ action ]().prev('li')[ action ]();
 
-				if( this.value )
+				if( this.value ){
+					Struts.sprintBar.setSprintValue( $(this).children('') )
 					Get.historyBySprint( this.value );
-			}).change();
+				}
+			});
 		},
 		mountSelect: function( dados ){
 			var selected = false;
@@ -143,47 +258,34 @@ var Struts = {
 					'<tr class="history '+ hist.id +'">' +
 						'<td class="description">' +
 							( active ? '<img src="images/history/delete.png" class="deleteHistory" alt="X" title="Delete history" />' : '' ) +
+							'<img src="images/history/history.png" class="colapseHistory" alt="-" title="Colapse history" />' +
 							'<span>'+
 								'<sup>'+ hist.estimate +'</sup>&nbsp;'+
 								'<b>'+ hist.name +'</b>'+
 							'</span>'+
 							'<br /><i>' + hist.text + '</i>' +
 						'</td>' +
-						//TODO: Corrigir o title colocando o id como $.data
 						'<td class="box">'+ ( active ? '<img src="images/notes/add.png" alt="+" title="1" class="addTask" />' : '' ) +'</td>' +
 						'<td class="box">'+ ( active ? '<img src="images/notes/add.png" alt="+" title="2" class="addTask" />' : '' ) +'</td>' +
 						'<td class="box">'+ ( active ? '<img src="images/notes/add.png" alt="+" title="3" class="addTask" />' : '' ) +'</td>' +
 					'</tr>'
-				).find('tr:last').data('id',hist.id);
+				).find('tr.'+ hist.id).data('id',hist.id)
+				 .find('img').hide();
+				 
+				// SET THE STATUS IN THE ADD TASK IMAGE
+				$('#main > tbody img.addTask').each(function(){
+					var img = $(this);
+					img.data('status',img.attr('title')).attr('title','Add Task');
+				});
 
 				Get.taskByHistory( hist.id );
 			});
 
-			// IF !ACTIVE DOESNT INIT THE ACTIONS
+			// IF DONT NEED TO SET DE PROPPABLE
 			if( !active ) return false;
 
-			// MAKE THE HISTORY ACTIONS
-			$('td.description').each(function(){
-				// IMAGE DELETE ACTION
-				$(this).children('img.deleteHistory').click( function(){
-				 	Delete.history(
-						$(this).parent().parent(), tr.data('id')
-					);
-				}).hide();
-
-				// IMAGE DELETE MOUSEOVER
-				$(this).mouseover(function(){
-					$( this ).children('img.deleteHistory').show();
-				});
-
-				// IMAGE DELETE MOUSEOUT
-				$(this).mouseout(function(){
-					$( this ).children('img.deleteHistory').hide();
-				});
-			});
-
 			// MAKE THE ADD TASK ACTIONS
-			$('#main > tbody > tr > td:gt(0)').each(function(){
+			$('#main > tbody td.box:not(.ui-droppable)').each(function(){
 				// MAKE THE TD A DROPZONE
 				$(this).droppable({
 					hoverClass: 'hoverBox',
@@ -212,28 +314,11 @@ var Struts = {
 						return window.statusJSON;
 					}
 				});
-
-				// IMAGE ADD ACTION
-				$(this).children('img.addTask').click( function(){
-				 	Struts.newTask = {
-						history: $(this).parent().parent().data('id'),
-						status: $(this).attr('title')
-					}; Add.task();
-				}).hide();
-
-				// IMAGE ADD MOUSEOVER
-				$(this).mouseover(function(){
-					$( this ).children('img.addTask').show();
-				});
-
-				// IMAGE ADD MOUSEOUT
-				$(this).mouseout(function(){
-					$( this ).children('img.addTask').hide();
-				});
 			});
 		}
 	},
 	task: {
+		data: {},
 		mount: function( dados ){
 			var active = $('#sprintSelect option:selected').data('status');
 
@@ -253,12 +338,11 @@ var Struts = {
 					.children('img.deleteTask').hide();
 			});
 
-			// VERIFICA SE PRECISA MONTAR AS ACOES DAS TASKS
+			// IF DONT NEDD TO SET THE DRAGGABLE
 			if( !active ) return false;
 
-			$('span.dragBox').each(function(){
-				var span = $(this);
-				span.draggable({
+			$('span.dragBox:not(.ui-draggable)').each(function(){
+				$(this).draggable({
 					zIndex: 666,
 					opacity: 0.7,
 					revert: true,
@@ -270,14 +354,6 @@ var Struts = {
 							'left':'0px'
 						});
 					}
-				}).mouseover(function(){
-					$( this ).children('img.deleteTask').show();
-				}).mouseout(function(){
-					$( this ).children('img.deleteTask').hide();
-				}).children('img.deleteTask').click(function(){
-					Delete.task(
-						$(this).parent().data('task'), $(this).parent()
-					);
 				});
 			});
 		}
@@ -304,8 +380,8 @@ var Add = {
 		Modal.load(
 			'pages/addTask.html','Add Task',function(){
 				$('div.main')
-					.find('select').val( Struts.newTask.status ).parent()
-					.find('input:hidden[name=history]').val( Struts.newTask.history );
+					.find('select').val( Struts.task.data.status ).parent()
+					.find('input:hidden[name=history]').val( Struts.task.data.history );
 			}
 		);
 	}
@@ -647,8 +723,40 @@ var Modal = {
 	}
 };
 
+// STRING PROTOTYPES
 String.prototype.dateToPtBr = function(){
 	return this.split( '-' ).reverse().join('/');
+}
+
+// DATE PROTOTYPES
+Date.prototype.isSameDay = function( date ){
+	return date instanceof Date
+		? this.getFullYear() == date.getFullYear() &&
+			this.getMonth() == date.getMonth() &&
+			this.getDate() == date.getDate()
+		: null;
+}
+
+Date.prototype.isLesser = function( date ){
+	return date instanceof Date
+		? date.isGreater( this ) && !this.isSameDay( date )
+		: null;
+}
+
+Date.prototype.isGreater = function( date ){
+	return date instanceof Date
+		? this.getFullYear() > date.getFullYear()
+			? true
+			: this.getFullYear() == date.getFullYear()
+				? this.getMonth() > date.getMonth()
+					? true
+					: this.getMonth() == date.getMonth()
+						? this.getDate() > date.getDate()
+							? true
+							: false
+						: false
+				: false
+		: null;
 }
 
 function printError(cod,message,sql){

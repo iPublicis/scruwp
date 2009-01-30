@@ -5,72 +5,77 @@
 		<link rel="shortcut icon" href="favicon.ico">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8;"/>
 		<link rel="stylesheet" href="css/layout.css" type="text/css" media="all" />
+		<link rel="stylesheet" href="css/themes/base/ui.all.css" type="text/css" media="all" />
     </head>
     <body>
     	<div id="header">
     		<h1>Scruwp :: Scrum With PHP</h1>
+			<div id="options">
+				<span class="button">Opções</span>
+				<div class="container" style="display: none;">
+					<ul>
+						<li class="team">
+							<nobr>
+		    					<label for="teamSelect"><b>Team:</b></label>
+		    					<select id="teamSelect">
+		    						<optgroup label="Teams">
+		    							<option value="">...</option>
+									</optgroup>
+								</select>
+							</nobr>
+							<ul>
+								<li>
+									<a href="javascript:void(0);" class="addTeam link">Adicionar</a>
+								</li>
+							</ul>
+						</li>
+						<li>&nbsp;</li>
+						<li class="sprint">
+							<nobr>
+		    					<label for="sprintSelect"><b>Sprint:</b></label>
+		    					<select id="sprintSelect">
+		    						<optgroup label="Sprints">
+		    							<option value="">...</option>
+									</optgroup>
+								</select>
+							</nobr>
+							<ul>
+								<li>
+									<a href="javascript:void(0);" class="addSprint link">Adicionar</a>
+								</li>
+								<li>
+									<a href="javascript:void(0);" class="defaultSprint link">Marcar atual</a>
+								</li>
+							</ul>
+						</li>
+						<li>&nbsp;</li>
+						<li class="history">
+							<nobr>
+		    					<label for="sprintSelect"><b>History:</b></label>
+							</nobr>
+							<ul>
+								<li>
+									<a href="javascript:void(0);" class="addHistory link">Adicionar</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
     	</div>
     	<table id="main" width="100%" cellspacing="0" cellpadding="0" border="0">
     		<thead>
     			<tr>
-    				<th></th>
-    				<th colspan="2"></th>
-    				<th class="options">
-    					<span class="button">Opções</span>
-						<div class="container" style="display: none;">
-							<ul>
-								<li class="team">
-									<nobr>
-				    					<label for="teamSelect"><b>Team:</b></label>
-				    					<select id="teamSelect">
-				    						<optgroup label="Teams">
-				    							<option value="">...</option>
-											</optgroup>
-										</select>
-									</nobr>
-									<ul>
-										<li>
-											<a href="javascript:void(0);" class="addTeam link">Adicionar</a>
-										</li>
-									</ul>
-								</li>
-								<li>&nbsp;</li>
-								<li class="sprint">
-									<nobr>
-				    					<label for="sprintSelect"><b>Sprint:</b></label>
-				    					<select id="sprintSelect">
-				    						<optgroup label="Sprints">
-				    							<option value="">...</option>
-											</optgroup>
-										</select>
-									</nobr>
-									<ul>
-										<li>
-											<a href="javascript:void(0);" class="addSprint link">Adicionar</a>
-										</li>
-										<li>
-											<a href="javascript:void(0);" class="defaultSprint link">Marcar atual</a>
-										</li>
-									</ul>
-								</li>
-								<li>&nbsp;</li>
-								<li class="history">
-									<nobr>
-				    					<label for="sprintSelect"><b>History:</b></label>
-									</nobr>
-									<ul>
-										<li>
-											<a href="javascript:void(0);" class="addHistory link">Adicionar</a>
-										</li>
-									</ul>
-								</li>
-							</ul>
-						</div>
+    				<th class="begin"></th>
+    				<th colspan="2">
+    					<div id="progressbar"></div>
     				</th>
+					<th class="end"></th>
     			</tr>
     			<tr>
     				<th>
-    					<span>history</span>
+    					<span style="float: left;">history</span>
+						<img src="images/history/history.png" id="colapseAll" alt="-" title="Colapse All history" />
 					</th>
     				<th>
     					<span>todo</span>
@@ -103,14 +108,12 @@
 		</div>
     </body>
 	<head>
-        <script type="text/javascript" src="js/jquery.1.3.min.js"></script>
+        <script type="text/javascript" src="js/jquery.1.3.1.min.js"></script>
         <script type="text/javascript" src="js/jquery.ui.all.min.js"></script>
+        <script type="text/javascript" src="js/jquery.cookie.js"></script>
         <script type="text/javascript" src="js/script.js?<?= rand() ?>"></script>
 		<script type="text/javascript">
-			$(function(){
-				$('#main > tbody > tr:odd > td').css('background-color','#F9F9F9');
-				Struts.init();
-			});
+			$( Struts.init );
 		</script>
 	</head>
 </html>
