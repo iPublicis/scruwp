@@ -1,0 +1,26 @@
+<form method="post" onsubmit="return Save.user();">
+	<input type="hidden" name="action" value="addUser" />
+	<div class="response"></div>
+
+	<label for="name">Name: </label><br />
+	<input type="text" name="name" value="" />
+
+	<br />
+
+	<label for="color">Color:</label><br />
+	<select name="idColorSet">
+		<option value="">Select...</option>
+	</select>
+
+	<br /><br />
+
+	<input type="submit" value="Add user" />
+</form>
+
+<br />
+
+<script type="text/javascript">
+	$(function(){
+		Get.colorSet( '#content select[name=idColorSet]' );
+	});
+</script>

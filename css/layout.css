@@ -65,24 +65,30 @@ div#options div.container ul li ul li {
 }
 
 div#options div.container a.link {
-	padding: 2px 2px 2px 20px;
+	background-repeat: no-repeat;
+	background-position: 2px 1px;
+	padding: 2px 2px 2px 22px;
 	font-size: 14px;
 }
 
+div#options div.container ul li a.addTeam {
+	background-image: url('../images/team/add.png');
+}
+
+div#options div.container ul li a.addUser {
+	background-image: url('../images/user/add.png');
+}
+
 div#options div.container ul li a.addSprint {
-	background: url('../images/sprint/add.png') no-repeat 2px 3px;
+	background-image: url('../images/sprint/add.png');
 }
 
 div#options div.container ul li a.defaultSprint {
-	background: url('../images/sprint/link.png') no-repeat 2px 3px;
-}
-
-div#options div.container ul li a.addTeam {
-	background: url('../images/team/add.png') no-repeat 2px 3px;
+	background-image: url('../images/sprint/link.png');
 }
 
 div#options div.container ul li a.addHistory {
-	background: url('../images/history/add.png') no-repeat 2px 4px;
+	background-image: url('../images/history/add.png');
 }
 
 /* TABLE */
@@ -180,8 +186,8 @@ table#main tfoot td div.sprintOpt {
 span.dragBox {
     width: 80px;
     height: 70px;
-    margin: 5px 0 0 5px;
-    padding: 3px;
+    margin: 3px 0 0 3px;
+    padding: 1px;
     font-size: 10px;
     display: inline-block;
 }
@@ -190,11 +196,20 @@ span.ui-draggable {
     cursor: pointer;
 }
 
+span.dragBox img.editTask,
 span.dragBox img.deleteTask {
     position: absolute;
     cursor: pointer;
+}
+
+span.dragBox img.editTask {
     right: 2px;
     top: 2px;
+}
+
+span.dragBox img.deleteTask {
+    right: 2px;
+    bottom: 2px;
 }
 
 span.dragBox span.text,
@@ -318,5 +333,10 @@ img {
     border: 0px none;
 }
 a {
-    text-decoration: none;
+	text-decoration: none;
 }
+select {
+	text-transform: capitalize;
+}
+
+/* TASKS COLOR THEMES */

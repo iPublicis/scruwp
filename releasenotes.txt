@@ -1,3 +1,14 @@
+Version 0.5.2:
+	* Scroll top for modal and back when close it;
+	* Add the edit task option;	# Issue 4
+	* Translated the options menu;
+
+	BUGS Fix:
+		* Fix the history remove button;	# Issue: 5
+		* Fix the background height;		# Issue: 3
+		* Changed all the form to POST;
+		* Fix the overflow of the user name in task;
+
 Version 0.5.1:
 	* Change to jQuery 1.3.1;
 	* Several JS improvments;
@@ -5,7 +16,7 @@ Version 0.5.1:
 	* Options menu out off table's thead;
 	* Ajax.complete clear the messages;
 	* Add the progressbar for the sprint time elapsed;
-	* Now stories can be colapsed;
+	* Now stories can be colapsed;	# Issue: 1
 	* Add the Date.prototypes;
 	* Add the CSS for jQuery UI;
 

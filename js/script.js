@@ -4,6 +4,8 @@ var Struts = {
 		Struts.menu();
 		// LOAD ALL THE SPRINTS
 		Get.team();
+		// GET ALL USERS
+		Get.user();
 		// MODAL CORRECTIONS
 		Modal.initialize();
 		// EVENT CHANGE SPRINT
@@ -12,6 +14,8 @@ var Struts = {
 		Show.init();
 		// EVENT CHANGE TEAM
 		Struts.team.init();
+		// EVENT CHANGE USER
+		Struts.user.init();
 		// LOAD PROGRESSBAR
 		Struts.sprintBar.init();
 		// LOAD ALL LIVE EVENTS
@@ -41,8 +45,9 @@ var Struts = {
 
 		// DELETE HISTORY
 		$('img.deleteHistory').live('click',function(){
+			var tr = $(this).parent().parent();
 		 	Delete.history(
-				$(this).parent().parent(), tr.data('id')
+				tr.data('id'), tr
 			);
 		});
 
@@ -54,12 +59,35 @@ var Struts = {
 		});
 
 		// IMAGE ADD TASK
-		$('img.addTask').live('click',function(){
+		$('img.addTask').live('click',function(e){
+			var offset = $(e.target).offset();
+
+			Modal.position.top =
+				offset.top > window.innerHeight ? offset.top : 0;
+
 		 	Struts.task.data = {
 				history: $(this).parent().parent().data('id'),
 				status: $(this).data('status')
 			};
+
 			Add.task();
+		});
+
+		// IMAGE EDIT TASK
+		$('img.editTask').live('click',function(e){
+			var offset = $(e.target).offset();
+
+			Modal.position.top =
+				offset.top > window.innerHeight ? offset.top : 0;
+
+			Edit.task( $(this).parent().data('task') );
+		});	
+
+		// DELETE TASK
+		$('img.deleteTask').live('click',function(){
+			Delete.task(
+				$(this).parent().data('task'), $(this).parent()
+			);
 		});
 
 		// TASK ADD MOUSE EVENTS
@@ -71,16 +99,9 @@ var Struts = {
 
 		// TASK IMAGES MOUSE EVENTS
 		$('span.dragBox').live('mouseover',function(){
-			$(this).children('img.deleteTask').show();
+			$(this).children('img').show();
 		}).live('mouseout',function(){
-			$(this).children('img.deleteTask').hide();
-		});		
-
-		// DELETE TASK
-		$('img.deleteTask').live('click',function(){
-			Delete.task(
-				$(this).parent().data('task'), $(this).parent()
-			);
+			$(this).children('img').hide();
 		});
 	},
 	sprintBar: {
@@ -165,11 +186,49 @@ var Struts = {
 		var menuDiv = 'div.container ';
 		// TEAM ACTIONS
 		$( menuDiv + 'a.addTeam').click( Add.team );
+		// USER ACTIONS
+		$( menuDiv + 'a.addUser').click( Add.user );
 		// SPRINT ACTIONS
 		$( menuDiv + 'a.addSprint').click( Add.sprint );
 		$( menuDiv + 'a.defaultSprint').click( Save.defaultSprint );
 		// HISTORY ACTIONS
 		$( menuDiv + 'a.addHistory').click( Add.history );
+	},
+	colorSet: {
+		mountSelect: function( dados,selector ){
+			$.each(dados,function(){
+				$( selector ).append(
+					'<option value="'+ this.id +'">'+ this.name +'</option>'
+				).children('option:last')
+					.data('background',this.background)
+					.data('color',this.color);
+			});
+		}
+	},
+	user: {
+		init: function(){
+			Struts.user.initSelectAction();
+		},
+		initSelectAction: function(){
+			$('#userSelect').change(function(){
+				$.cookie( 'userSelect', this.value, { expires: 365 } );
+
+				Get.historyBySprint(
+					$('#sprintSelect').val()
+				);
+			});
+		},
+		mountSelect: function( dados,selector ){
+			$( selector +' > optgroup > option').remove();
+
+			var select = $( selector +' > optgroup:first');
+			$.each(dados,function(){
+				var selected = $.cookie('userSelect') == this.id ? 'selected="selected"' : '';
+				select.append(
+					'<option value="'+ this.id +'" '+ selected +'>'+ this.name +'</option>'
+				);
+			});
+		}
 	},
 	team: {
 		init: function(){
@@ -181,12 +240,10 @@ var Struts = {
 				$('li.sprint')[ action ]().prev('li')[ action ]();
 
 				if( this.value ){
-					$.cookie('teamSelect',this.value,
-						{ expires: 365, secure: true }
-					);
+					$.cookie( 'teamSelect', this.value, { expires: 365 } );
 					Get.sprintByTeam( this.value );
 				}
-			}).change();
+			});
 		},
 		mountSelect: function( dados,id ){
 			$('#teamSelect > optgroup:first > option'+ (
@@ -250,11 +307,20 @@ var Struts = {
 	history: {
 		mount: function( dados ){
 			// VERIFY IF THE SPRINT IS THE ACTIVE
-			var active = $('#sprintSelect option:selected').data('status');
+			var active = $('#sprintSelect option:selected').data('status'),
+
+			// IMG TEMPLATE
+			image = '<img src="images/notes/add.png" alt="+" title="Add task" class="addTask" />',
+			
+			// TD.BOX TEMPLATE
+			tdBox = '<td class="box">'+ ( active ? image : '' ) +'</td>',
+
+			// GET THE TABLE
+			tbody = $('#main > tbody');
 
 			// MOUNT EACH HISTORY LINE
 			$.each(dados,function(h,hist){
-				$('#main > tbody').append(
+				tbody.append(
 					'<tr class="history '+ hist.id +'">' +
 						'<td class="description">' +
 							( active ? '<img src="images/history/delete.png" class="deleteHistory" alt="X" title="Delete history" />' : '' ) +
@@ -265,17 +331,14 @@ var Struts = {
 							'</span>'+
 							'<br /><i>' + hist.text + '</i>' +
 						'</td>' +
-						'<td class="box">'+ ( active ? '<img src="images/notes/add.png" alt="+" title="1" class="addTask" />' : '' ) +'</td>' +
-						'<td class="box">'+ ( active ? '<img src="images/notes/add.png" alt="+" title="2" class="addTask" />' : '' ) +'</td>' +
-						'<td class="box">'+ ( active ? '<img src="images/notes/add.png" alt="+" title="3" class="addTask" />' : '' ) +'</td>' +
+						tdBox + tdBox + tdBox +
 					'</tr>'
 				).find('tr.'+ hist.id).data('id',hist.id)
 				 .find('img').hide();
 				 
 				// SET THE STATUS IN THE ADD TASK IMAGE
-				$('#main > tbody img.addTask').each(function(){
-					var img = $(this);
-					img.data('status',img.attr('title')).attr('title','Add Task');
+				tbody.find('tr.'+ hist.id +' img.addTask').each(function(i){
+					$(this).data('status',( i + 1 ));
 				});
 
 				Get.taskByHistory( hist.id );
@@ -320,22 +383,36 @@ var Struts = {
 	task: {
 		data: {},
 		mount: function( dados ){
-			var active = $('#sprintSelect option:selected').data('status');
+			// GET SPRINT'S ACTIVE STATUS
+			var active = $('#sprintSelect option:selected').data('status'),
+				cookieUser = $.cookie('userSelect');
 
 			$.each( dados,function(){
+				if( cookieUser && cookieUser != this.idUser )
+					return true;
+
 				var tds = $('#main > tbody > tr.'+ this.idHistory +' > td:eq('+ this.idStatus +')')
 					.append(
-						'<span class="dragBox" style="background-color:#'+ this.color +'">' +
+						'<span id="task_'+ this.id +'" class="dragBox">' +
 							'<span class="text">' + this.text + '</span>' +
 							'<span class="name">' + this.name + '</span>' +
 							( active ? '<img src="images/notes/delete.png" class="deleteTask" alt="X" title="Delete task" />' : '' ) +
+							( active ? '<img src="images/notes/edit.png" class="editTask" alt="E" title="Edit task" />' : '' ) +
 						'</span>' )
 					.find('span.dragBox:last')
+					.css({
+						'color' : '#' + this.color,
+						'border' : '1px solid #'+ this.border,
+						'background-color' : '#' + this.background
+					})
 					.data( 'history',this.idHistory )
 					.data( 'status',this.idStatus )
 					.data( 'task',this.id )
 					.hide().fadeIn('slow')
-					.children('img.deleteTask').hide();
+					.children('img.deleteTask,img.editTask').hide()
+					.siblings('span.name').css({
+						'border-top' : '1px solid #'+ this.border
+					});
 			});
 
 			// IF DONT NEDD TO SET THE DRAGGABLE
@@ -363,26 +440,39 @@ var Struts = {
 var Add = {
 	team: function(){
 		Modal.load(
-			'pages/addTeam.html','Add team'
+			'pages/add/team.html','Add team'
 		);
 	},
 	sprint: function(){
 		Modal.load(
-			'pages/addSprint.html','Add sprint'
+			'pages/add/sprint.html','Add sprint'
 		);
 	},
 	history: function(){
 		Modal.load(
-			'pages/addHistory.html','Add history'
+			'pages/add/history.html','Add history'
+		);
+	},
+	user: function(){
+		Modal.load(
+			'pages/add/user.html','Add User'
 		);
 	},
 	task: function(){
 		Modal.load(
-			'pages/addTask.html','Add Task',function(){
-				$('div.main')
+			'pages/add/task.html','Add Task',function(){
+				$('#content div.main')
 					.find('select').val( Struts.task.data.status ).parent()
 					.find('input:hidden[name=history]').val( Struts.task.data.history );
 			}
+		);
+	}
+};
+
+var Edit = {
+	task: function( id ){
+		Modal.load(
+			( 'pages/edit/task.phtml?id='+ id ),'Edit Task'
 		);
 	}
 };
@@ -393,6 +483,18 @@ var Get = {
 			$.isFunction( callBack ) ? callBack : function(){}
 		);
 	},
+	colorSet: function( selector ){
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: ( 'action=getColorSet' ),
+			success: function( json ){
+				Struts.colorSet.mountSelect( json.data || [], selector );
+			}
+		});
+	},
 	team: function( id ){
 		$.ajax({
 			cache: false,
@@ -402,6 +504,21 @@ var Get = {
 			data: ( 'action=getTeam' ),
 			success: function( json ){
 				Struts.team.mountSelect( json.data || [], id );
+			}
+		});
+	},
+	user: function( selector ){
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: ( 'action=getUser' ),
+			success: function( json ){
+				Struts.user.mountSelect(
+					json.data || [],
+					selector  || '#userSelect'
+				);
 			}
 		});
 	},
@@ -468,6 +585,13 @@ var Get = {
 				Struts.task.mount( json.data || [] );
 			}
 		});
+
+		return false;
+	},
+	taskData: function( id ){
+		$.get('includes/ajax.php',( 'action=getTask&id=' + id ),function(){
+			console.log( id,arguments )
+		},'json');
 	},
 	taskByHistory: function( id ){
 		if( !id )
@@ -500,7 +624,25 @@ var Save = {
 						Get.team( json.id );
 					});
 				} else {
-					$('div.response').addClass('error').html( json.message );
+					$('#content div.response').addClass('error').html( json.message );
+				}
+			}
+		});
+	},
+	user: function(){
+		$.ajax({
+			cache: false,
+			method: 'POST',
+			dataType: 'json',
+			url: 'includes/ajax.php',
+			data: $('#content :input').serialize(),
+			success: function( json ){
+				if( json.code == 0 ){
+					Modal.close(function(){
+						Get.user();
+					});
+				} else {
+					$('#content div.response').addClass('error').html( json.message );
 				}
 			}
 		});
@@ -518,7 +660,7 @@ var Save = {
 						Get.sprintByTeam( $('#teamSelect').val() );
 					});
 				} else {
-					$('div.response').addClass('error').html( json.message );
+					$('#content div.response').addClass('error').html( json.message );
 				}
 			}
 		});
@@ -532,7 +674,7 @@ var Save = {
 			data: $('#content :input').serialize(),
 			success: function( json ){
 				if( json.code == 0 ){
-					$('div.response').addClass('success').html( json.message );
+					$('#content div.response').addClass('success').html( json.message );
 					Modal.close(function(){
 						Get.history( json.id );
 					});
@@ -550,13 +692,17 @@ var Save = {
 			data: $('#content :input').serialize(),
 			success: function( json ){
 				if( json.code == 0 ){
-					$('div.response').addClass('success').html( json.message );
+					$('#content div.response').addClass('success').html( json.message );
 					Modal.close(function(){
+						if( json.action == 'edtTask' ){
+							$('#task_'+json.id).fadeOut('fast').remove();
+						}
 						Get.task( json.id );
 					});
 				}
 			}
 		});
+
 		return false;
 	},
 	taskStatus: function( span,td ){
@@ -676,23 +822,40 @@ var Show = {
 };
 
 var Modal = {
-	//TODO: Fazer o window.rezise com o Modal
+	position: {
+		top: 0
+	},
 	initialize: function(){
 		$('#content > a.close').click( Modal.close );
 	},
 	open: function(){
-		$('#backGround').fadeIn('fast',function(){
-			$('#content').fadeIn('fast');
-		});
+		$('#backGround').height( $(document).height() )
+			.fadeIn('fast',function(){
+				$('html,body').animate({ scrollTop: 0 }, 'fast', function(){
+					$('#content').fadeIn('fast');
+				});
+			}
+		);
 	},
 	load: function( url,title,callBack ){
-		var content = $('div.main');
-		$('span.header').html( title || '' );
 		this.open();
 
+		var content = $('#content div.main'),
+			index = url.indexOf('?'),
+			param = '';
+
+		$('#content span.header').html( title || '' );
+
+		// VERIFY FOR PARAMETERS
+		if( index > -1 ){
+			param = url.substr( index + 1 );
+			url = url.substr( 0,index )
+		}
+
 		$.ajax({
-			cache: false,
 			url: url,
+			data: param,
+			cache: false,
 			dataType: 'html',
 			beforeSend: function(){
 				loading( false );
@@ -713,12 +876,15 @@ var Modal = {
 	},
 	close: function( callBack ){
 		$('#content').fadeOut( 'fast',function(){
-			$('div.main').empty();
-			$('#backGround').fadeOut( 'fast',function(){
-				if( $.isFunction( callBack ) ){
-					callBack();
-				}
-			} );
+			$('#content div.main').empty();
+			$('html').animate({ scrollTop: Modal.position.top }, 'fast', function(){
+				$('#backGround').fadeOut( 'fast',function(){
+					Modal.position.top = 0;
+					if( $.isFunction( callBack ) ){
+						callBack();
+					}
+				} );
+			});
 		} );
 	}
 };
