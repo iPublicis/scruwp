@@ -283,8 +283,10 @@ div#content a.close {
     position: absolute;
     top: 10px;
     right: 10px;
+	color: #FF5555;
     padding-left: 18px;
-    background: url('../images/refresh.gif') no-repeat;
+	font-weight: bold;
+    background: url('../images/close.png') no-repeat;
 }
 
 div#content label {

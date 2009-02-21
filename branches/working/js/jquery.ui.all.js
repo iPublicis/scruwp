@@ -4038,7 +4038,7 @@ var colors = {
  *
  * Open source under the BSD License.
  *
- * Copyright © 2008 George McGinley Smith
+ * Copyright ï¿½ 2008 George McGinley Smith
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -4207,7 +4207,7 @@ $.extend($.easing,
  *
  * Open source under the BSD License.
  *
- * Copyright © 2001 Robert Penner
+ * Copyright ï¿½ 2001 Robert Penner
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -7750,6 +7750,8 @@ $.widget("ui.progressbar", {
 			});
 
 		this.valueDiv = $('<div class="ui-progressbar-value ui-widget-header ui-corner-left"></div>').appendTo(this.element);
+		
+		this.valueDiv.width('0%');
 
 		this._refreshValue();
 
@@ -7816,7 +7818,9 @@ $.widget("ui.progressbar", {
 	_refreshValue: function() {
 		var value = this.value();
 		this.valueDiv[value == this._valueMax() ? 'addClass' : 'removeClass']("ui-corner-right");
-		this.valueDiv.width(value + '%');
+		this.valueDiv.animate({
+			'width': value + '%'
+		},2000);
 		this.element.attr("aria-valuenow", value);
 	}
 

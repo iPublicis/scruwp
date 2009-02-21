@@ -8,7 +8,7 @@
 	<br />
 
 	<label for="color">Color:</label><br />
-	<select name="idColorSet">
+	<select id="colorSet" name="idColorSet">
 		<option value="">Select...</option>
 	</select>
 
@@ -21,6 +21,6 @@
 
 <script type="text/javascript">
 	$(function(){
-		Get.colorSet( '#content select[name=idColorSet]' );
+		Get.colorSet( '#colorSet' ); 
 	});
 </script>
