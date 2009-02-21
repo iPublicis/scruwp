@@ -11,7 +11,7 @@
     	<div id="header">
     		<h1>Scruwp :: Scrum With PHP</h1>
 			<div id="options">
-				<span class="button">Opções</span>
+				<span class="button">Options</span>
 				<div class="container" style="display: none;">
 					<ul>
 						<li class="team">
@@ -25,7 +25,23 @@
 							</nobr>
 							<ul>
 								<li>
-									<a href="javascript:void(0);" class="addTeam link">Adicionar</a>
+									<a href="javascript:void(0);" class="addTeam link">Add team</a>
+								</li>
+							</ul>
+						</li>
+						<li>&nbsp;</li>
+						<li class="user">
+							<nobr>
+		    					<label for="userSelect"><b>User:</b></label>
+		    					<select id="userSelect">
+	    							<option value="">All users</option>
+		    						<optgroup label="Users">
+									</optgroup>
+								</select>
+							</nobr>
+							<ul>
+								<li>
+									<a href="javascript:void(0);" class="addUser link">Add user</a>
 								</li>
 							</ul>
 						</li>
@@ -41,10 +57,10 @@
 							</nobr>
 							<ul>
 								<li>
-									<a href="javascript:void(0);" class="addSprint link">Adicionar</a>
+									<a href="javascript:void(0);" class="addSprint link">Add sprint</a>
 								</li>
 								<li>
-									<a href="javascript:void(0);" class="defaultSprint link">Marcar atual</a>
+									<a href="javascript:void(0);" class="defaultSprint link">Make default</a>
 								</li>
 							</ul>
 						</li>
@@ -55,7 +71,7 @@
 							</nobr>
 							<ul>
 								<li>
-									<a href="javascript:void(0);" class="addHistory link">Adicionar</a>
+									<a href="javascript:void(0);" class="addHistory link">Add history</a>
 								</li>
 							</ul>
 						</li>
