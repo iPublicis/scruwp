@@ -1,0 +1,38 @@
+<form method="post" onsubmit="return Save.sprint();">
+	<input type="hidden" name="action" value="addSprint" />
+	<input type="hidden" name="idTeam" value="" />
+	<div class="response"></div>
+
+	<label for="beginDate">Data Inicio: </label><br />
+	<input type="text" name="beginDate" value="" />
+
+	<br />
+
+	<label for="duration">Duração: </label><br />
+	<select name="duration">
+		<option value="">Selecione...</option>
+		<option value="1">1 Semana</option>
+		<option value="2">2 Semanas</option>
+		<option value="3">3 Semanas</option>
+	</select>
+
+	<br /><br />
+
+	<label for="status">Ativo: </label><br />
+	<select name="status">
+		<option value="0" selected="selected">Não</option>
+		<option value="1">Sim</option>
+	</select>
+
+	<br /><br />
+
+	<input type="submit" value="Adicionar" />
+</form>
+<br />
+<script type="text/javascript">
+	$(function(){
+		$(':hidden[name=idTeam]').val(
+			$('#teamSelect').val()
+		);
+	});
+</script>
