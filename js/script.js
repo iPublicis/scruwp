@@ -111,6 +111,9 @@ var Struts = {
 		setSprintValue: function(){
 			var idSprint = $('#sprintSelect').val();
 			$.get('includes/ajax.php',( 'action=getSprint&id='+ idSprint ),function(json){
+				if( json.data == undefined || json.count == 0 )
+					return false;
+
 				var tHead = $('#main > thead > tr:first > th');
 
 				tHead.eq(0).html( json.data[0].beginDate.dateToPtBr() );
@@ -147,6 +150,14 @@ var Struts = {
 				total = date2 - date1;
 
 			return parseInt( ( posit * 100 ) / total );
+		},
+		clear: function(){
+			console.info( 'clear' );
+			var tHead = $('#main > thead > tr:first > th');
+				tHead.eq(0).html('');
+				tHead.eq(2).html('');
+
+			$("#progressbar").progressbar( 'value',0 ).progressbar('disable');
 		}
 	},
 	menu: function(){
@@ -274,8 +285,10 @@ var Struts = {
 				$('li.history')[ action ]().prev('li')[ action ]();
 
 				if( this.value ){
-					Struts.sprintBar.setSprintValue( $(this).children('') )
 					Get.historyBySprint( this.value );
+					Struts.sprintBar.setSprintValue( this.value );
+				} else {
+					Struts.sprintBar.clear();
 				}
 			});
 		},
@@ -875,10 +888,10 @@ var Modal = {
 		});
 	},
 	close: function( callBack ){
-		$('#content').fadeOut( 'fast',function(){
+		$('#content').fadeOut( 'normal',function(){
 			$('#content div.main').empty();
-			$('html').animate({ scrollTop: Modal.position.top }, 'fast', function(){
-				$('#backGround').fadeOut( 'fast',function(){
+			$('html').animate({ scrollTop: Modal.position.top }, 'normal', function(){
+				$('#backGround').fadeOut( 'normal',function(){
 					Modal.position.top = 0;
 					if( $.isFunction( callBack ) ){
 						callBack();
@@ -945,6 +958,6 @@ function loading( remove ){
 	if( remove ){
 		content.find('div.loading').remove();
 	} else {
-		content.empty().append('<div class="loading">Carregando...</div>');
+		content.empty().append('<div class="loading">Loading...</div>');
 	}
 }
