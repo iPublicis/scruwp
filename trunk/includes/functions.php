@@ -1,6 +1,5 @@
 <?php
-error_reporting(0);
-require('config.php');
+//error_reporting(0);
 
 function connect(){
 	$conn = mysql_connect( DB_HOST,DB_USER,DB_PASS );
@@ -34,7 +33,7 @@ function printError( $return = false, $message = false ){
 }
 
 function sanitize( $buf ){
-	return str_replace( '"',"'", str_replace( "\n",'',$buf ) );
+	return str_replace( '"',"'", str_replace( "\n",' ',$buf ) );
 }
 
 function toMysql( $date = false ){
@@ -56,10 +55,37 @@ function commitTransaction(){
 	return (bool) mysql_query( 'COMMIT;' );
 }
 
+function query( $query ){
+	if( !$query ){
+		return array(
+			'status' => false, 'code' => 1, 'message' => 'Invalid Parameters'
+		);
+	}
+
+	$result = mysql_query( $query );
+
+	if( $result ){
+		$data = array();
+
+		while( $buf = mysql_fetch_assoc( $result ) ){
+			$data[] = $buf;
+		}
+
+		return array(
+			'status' => true, 'code' => mysql_errno(), 'count' => count( $data ), 'data' => $data
+		);
+	} else {
+		return array(
+			'status' => false, 'code' => mysql_errno(), 'message' => sanitize( mysql_error() ),
+			'query' => $query, 'count' => 0, 'data' => array()
+		);
+	}
+}
+
 function insert( $table = false, $fields = false, $values = false ){
 	if( !$table || !is_array( $fields ) || !is_array( $values ) ){
 		return array(
-			'status' => false, 'code' => 1, 'message' => 'Parâmetros inválidos'
+			'status' => false, 'code' => 1, 'message' => 'Invalid Parameters'
 		);
 	}
 
@@ -87,11 +113,11 @@ function insert( $table = false, $fields = false, $values = false ){
 function select( $table = false, $fields = false, $where = false ){
 	if( !$table || !is_array( $fields ) ){
 		return array(
-			'status' => false, 'code' => 1, 'message' => 'Parâmetros inválidos'
+			'status' => false, 'code' => 1, 'message' => 'Invalid Parameters'
 		);
 	}
 
-	$sql = ' SELECT '.
+	$sql =	' SELECT '.
 				implode( ', ',$fields ) .
 			' FROM '.
 				$table.
@@ -121,7 +147,7 @@ function select( $table = false, $fields = false, $where = false ){
 function update( $table = false, $values = false, $where = false ){
 	if( !$table || !is_array( $values ) ){
 		return array(
-			'status' => false, 'code' => 1, 'message' => 'Parâmetros inválidos'
+			'status' => false, 'code' => 1, 'message' => 'Invalid Parameters'
 		);
 	}
 
@@ -130,7 +156,7 @@ function update( $table = false, $values = false, $where = false ){
 	foreach( $values as $field => $value ){
 		$sql .= ( $i++ ? ',' : '' ).$field.' = "'. $value .'"';
 	}
-	
+
 	$sql .= ( $where && is_array( $where )
 		? ' WHERE '. implode( ' AND ',$where ) : '' ).';';
 
@@ -145,7 +171,7 @@ function update( $table = false, $values = false, $where = false ){
 function delete( $table = false, $where = false ){
 	if( !$table || !is_array( $where ) ){
 		return array(
-			'status' => false, 'code' => 1, 'message' => 'Parâmetros inválidos'
+			'status' => false, 'code' => 1, 'message' => 'Invalid Parameters'
 		);
 	}
 
@@ -159,25 +185,58 @@ function delete( $table = false, $where = false ){
 	);
 }
 
-function getJSON( $table = false, $fields = false, $where = false ){
+function selectToJSON( $table = false, $fields = false, $where = false ){
 	$return = select( $table, $fields, $where );
 
 	if( $return['status'] ){
-		$buf = '{ count: '. $return['count'].', data: [';
-			$i = 0;
-			foreach( $return['data'] as $row ){
-				$buf .= ( $i++ ? ',' : '' ).'{';
-				$j = 0;
-				foreach( $row as $key => $value ){
-					$buf .= ( $j++ ? ',' : '' ).$key.': "'. sanitize( $value ) .'"';
-				}
-				$buf .= '}';
-			}
-		$buf .= ']}';
-
-		return $buf;
+		return toJSON( $return );
 	} else {
 		return $return;
 	}
+}
+
+function queryToJSON( $query ){
+	$return = query( $query );
+
+	if( $return['status'] ){
+		return toJSON( $return );
+	} else {
+		return $return;
+	}
+}
+
+function toJSON( $return ){
+	$buf = '{ "count": '. $return['count'].', "data": [';
+		$i = 0;
+		foreach( $return['data'] as $row ){
+			$buf .= ( $i++ ? ',' : '' ).'{';
+			$j = 0;
+			foreach( $row as $key => $value ){
+				$buf .= ( $j++ ? ',' : '' ).'"'.$key.'"'.': "'. sanitize( $value ) .'"';
+			}
+			$buf .= '}';
+		}		
+	$buf .= ']}';
+
+	return $buf;
+}
+
+function mountSelect( $data = false, $name = false, $value = false ){
+	if( !$data || !$name ){
+		echo '';
+		return false;
+	}
+
+	$buf  = '<select name="'. $name .'">';
+	$buf .= '<option value="">Select...</option>';
+
+	foreach( $data as $option ){
+		$selected = $option['id'] == $value ? ' selected="selected"' : '';
+		$buf .= '<option value="'. $option['id'] .'"'. $selected .'>'. $option['name'] .'</option>';
+	}
+	
+	$buf .= '</select>';
+
+	return $buf;
 }
 ?>

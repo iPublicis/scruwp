@@ -1,7 +1,7 @@
 <?php
-error_reporting( 0 );
-require('functions.php');
-header('Content-type: text/json;');
+require_once('config.php');
+require_once('functions.php');
+header('Content-type: text/x-json;');
 
 $conn = connect();
 
@@ -9,6 +9,9 @@ switch( $_REQUEST['action'] ){
 	// TEAM
 	case 'addTeam': addTeam(); break;
 	case 'getTeam': getTeam(); break;
+	// USER
+	case 'addUser': addUser(); break;
+	case 'getUser': getUser(); break;
 	// SPRINT
 	case 'addSprint': addSprint(); break;
 	case 'getSprint': getSprint(); break;
@@ -20,12 +23,15 @@ switch( $_REQUEST['action'] ){
 	case 'deleteHistory': deleteHistory(); break;
 	case 'getHistoryBySprint': getHistoryBySprint(); break;
 	// TASK
-	case 'addTask': addTask(); break;
 	case 'getTask': getTask(); break;
+	case 'addTask': addTask(); break;
+	case 'edtTask': edtTask(); break;
 	case 'deleteTask': deleteTask(); break;
 	case 'getTaskByHistory': getTaskByHistory(); break;
 	// STATUS
 	case 'saveStatus': saveStatus(); break;
+	// OTHER
+	case 'getColorSet': getColorSet(); break;
 	// DEFAULT
 	default: blank();
 }
@@ -44,8 +50,35 @@ function addTeam(){
 }
 
 function getTeam(){
-	$return = getJSON(
+	$return = selectToJSON(
 		'teams', array( '*' )
+	);
+
+	if( is_array( $return ) ){
+		echo '{ code: ', $return['code'], ', message: "',sanitize( $return['message'] ),(
+			$return['query'] ? '", query: "'.$return['query'] : ''
+		),'" }';
+	} else {
+		echo $return;
+	}
+}
+
+// USER
+
+function addUser(){
+	$return = insert(
+		'users', array( 'name','idColorSet' ),
+		array( $_REQUEST['name'], $_REQUEST['idColorSet'] )
+	);
+
+	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',(
+		$return['code'] ? 'error' : 'Ok!'
+	),'" }';
+}
+
+function getUser(){
+	$return = selectToJSON(
+		'users', array( '*' )
 	);
 
 	if( is_array( $return ) ){
@@ -59,8 +92,8 @@ function getTeam(){
 
 // SPRINT
 
-//TODO: Adicionar transacao
 function addSprint(){
+	//TODO: Adicionar transacao
 	$update['status'] = true;
 
 	if( $_REQUEST['status'] )
@@ -90,7 +123,7 @@ function addSprint(){
 }
 
 function getSprint(){
-	$return = getJSON(
+	$return = selectToJSON(
 		'sprints', array( '*' ), array( 'id = '.$_REQUEST['id'] )
 	);
 
@@ -103,8 +136,8 @@ function getSprint(){
 	}
 }
 
-//TODO: Adicionar transacao
 function defaultSprint(){
+	//TODO: Adicionar transacao
 	$update['status'] = false;
 	$update = update( 'sprints',array( 'status' => 0 ) );
 
@@ -123,7 +156,7 @@ function defaultSprint(){
 }
 
 function getSprintByTeam(){
-	$return = getJSON(
+	$return = selectToJSON(
 		'sprints', array( '*' ), array( 'idTeam = '.$_REQUEST['id'] )
 	);
 
@@ -150,7 +183,7 @@ function addHistory(){
 }
 
 function getHistory(){
-	$return = getJSON(
+	$return = selectToJSON(
 		'histories', array( '*' ), (
 			$_REQUEST['id'] != 'undefined' ? array( ' id = '.$_REQUEST['id'].' ' ) : ''
 		)
@@ -188,7 +221,7 @@ function deleteHistory(){
 }
 
 function getHistoryBySprint(){
-	$return = getJSON(
+	$return = selectToJSON(
 		'histories', array( '*' ), array( 'idSprint = '.$_REQUEST['id'] )
 	);
 
@@ -205,8 +238,13 @@ function getHistoryBySprint(){
 
 function addTask(){
 	$return = insert(
-		'tasks', array( 'idHistory','idStatus','name','text','color' ),
-		array( $_REQUEST['history'],$_REQUEST['status'],$_REQUEST['name'],$_REQUEST['text'],$_REQUEST['color'] )
+		'tasks',
+		array( 'idHistory','idStatus','idUser','name','text','color' ),
+		array(
+			$_REQUEST['history'], $_REQUEST['status'],
+			$_REQUEST['userAddTask'], $_REQUEST['name'],
+			$_REQUEST['text'], $_REQUEST['color']
+		)
 	);
 
 	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',$return['message'],(
@@ -215,9 +253,24 @@ function addTask(){
 }
 
 function getTask(){
-	$return = getJSON(
-		'tasks', array( '*' ), array( 'id = '.$_REQUEST['id'] )
-	);
+	$return = queryToJSON('
+		SELECT
+			t.id,
+			t.idStatus,
+			t.idHistory,
+			t.idUser,
+			t.text,
+			u.name,
+			c.background,
+			c.border,
+			c.color
+		FROM
+			tasks t
+		INNER JOIN users u ON t.idUser = u.id
+		INNER JOIN colors_set c ON u.idColorSet = c.id
+		WHERE
+			t.id = '. $_REQUEST['id'] .'
+	');
 
 	if( is_array( $return ) ){
 		echo '{ code: ', $return['code'], ', message: "',sanitize( $return['message'] ),(
@@ -239,9 +292,24 @@ function deleteTask(){
 }
 
 function getTaskByHistory(){
-	$return = getJSON(
-		'tasks', array( '*' ), array( 'idHistory = '.$_REQUEST['id'] )
-	);
+	$return = queryToJSON('
+		SELECT
+			t.id,
+			t.idStatus,
+			t.idHistory,
+			t.idUser,
+			t.text,
+			u.name,
+			c.background,
+			c.border,
+			c.color
+		FROM
+			tasks t
+		INNER JOIN users u ON t.idUser = u.id
+		INNER JOIN colors_set c ON u.idColorSet = c.id
+		WHERE
+			t.idHistory = '. $_REQUEST['id'] .'
+	');
 
 	if( is_array( $return ) ){
 		echo '{ count: 0, code: ', $return['code'], ', message: "',sanitize( $return['message'] ),(
@@ -250,6 +318,19 @@ function getTaskByHistory(){
 	} else {
 		echo $return;
 	}
+}
+
+function edtTask(){
+	$return = update(
+		'tasks', array(
+			'idUser' => $_REQUEST['idUser'],
+			'text' => $_REQUEST['text'],
+		), array( 'id = '.$_REQUEST['id'] )
+	);
+
+	echo '{ code: ', $return['code'] ,', action: "', $_REQUEST['action'] ,'", id: ', $_REQUEST['id'] ,
+		', message: "',$return['message'],( $return['query'] ? '", query: "'.$return['query'] : '' ),
+	'" }';
 }
 
 function saveStatus(){
@@ -272,6 +353,20 @@ function saveStatus(){
 }
 
 // OTHER
+
+function getColorSet(){
+	$return = selectToJSON(
+		'colors_set', array( '*' )
+	);
+
+	if( is_array( $return ) ){
+		echo '{ code: ', $return['code'], ', message: "',sanitize( $return['message'] ),(
+			$return['query'] ? '", query: "'.$return['query'] : ''
+		),'" }';
+	} else {
+		echo $return;
+	}
+}
 
 function blank(){
 	die( '{ code: 1, message: "Invalid action" }' );
