@@ -12,6 +12,7 @@ switch( $_REQUEST['action'] ){
 	// USER
 	case 'addUser': addUser(); break;
 	case 'getUser': getUser(); break;
+	case 'edtUser': edtUser(); break;
 	// SPRINT
 	case 'addSprint': addSprint(); break;
 	case 'getSprint': getSprint(); break;
@@ -88,6 +89,19 @@ function getUser(){
 	} else {
 		echo $return;
 	}
+}
+
+function edtUser(){
+	$return = update(
+		'users', array(
+			'idColorSet' => $_REQUEST['idColorSet'],
+			'name' => $_REQUEST['name'],
+		), array( 'id = '.$_REQUEST['id'] )
+	);
+
+	echo '{ code: ', $return['code'] ,', action: "', $_REQUEST['action'] ,'", id: ', $_REQUEST['id'] ,
+		', message: "',$return['message'],( $return['query'] ? '", query: "'.$return['query'] : '' ),
+	'" }';
 }
 
 // SPRINT
@@ -216,7 +230,7 @@ function deleteHistory(){
 		}
 	}
 
-	echo '{ code: 1, message: "Error!" }';
+	echo '{ code: 1, message: "Ops! The history wasn\'t removed." }';
 	return rollbackTransaction();
 }
 
@@ -239,11 +253,10 @@ function getHistoryBySprint(){
 function addTask(){
 	$return = insert(
 		'tasks',
-		array( 'idHistory','idStatus','idUser','name','text','color' ),
+		array( 'idHistory','idStatus','idUser','text' ),
 		array(
 			$_REQUEST['history'], $_REQUEST['status'],
-			$_REQUEST['userAddTask'], $_REQUEST['name'],
-			$_REQUEST['text'], $_REQUEST['color']
+			$_REQUEST['userAddTask'], $_REQUEST['text']
 		)
 	);
 
