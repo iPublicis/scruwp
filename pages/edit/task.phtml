@@ -9,7 +9,7 @@ $conn = connect();
 // PEGA OS DADOS DA TASK
 $task = select(
 	'tasks t',
-	array( 't.name','t.idHistory','t.idStatus','t.idUser','t.text' ),
+	array( 't.idHistory','t.idStatus','t.idUser','t.text' ),
 	array( 't.id = '.$_REQUEST['id'] )
 );
 

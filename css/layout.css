@@ -79,6 +79,10 @@ div#options div.container ul li a.addUser {
 	background-image: url('../images/user/add.png');
 }
 
+div#options div.container ul li a.edtUser {
+	background-image: url('../images/user/edit.png');
+}
+
 div#options div.container ul li a.addSprint {
 	background-image: url('../images/sprint/add.png');
 }
