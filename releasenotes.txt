@@ -2,6 +2,7 @@ Version 0.6.1:
 	* Update jQuery to 1.3.2;
 	* Update jQuery UI to 1.7;
 	* Added the User Edit feature;
+	* Added the sanitize function on every query;
 
 	BUG Fix:
 		* Now form are send by POST ( Ops! :P )
