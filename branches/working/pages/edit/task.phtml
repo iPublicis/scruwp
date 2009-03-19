@@ -1,4 +1,4 @@
-<?
+<?php
 // INCLUI O ARQUIVO DE FUNCOES
 require_once('../../includes/config.php');
 require_once('../../includes/functions.php');
@@ -6,11 +6,14 @@ require_once('../../includes/functions.php');
 // CONECTA NO BANCO DE DADOS
 $conn = connect();
 
+// PEGA O ID DA TASK
+$id = sanitize( $_REQUEST['id'] );
+
 // PEGA OS DADOS DA TASK
 $task = select(
 	'tasks t',
 	array( 't.idHistory','t.idStatus','t.idUser','t.text' ),
-	array( 't.id = '.$_REQUEST['id'] )
+	array( 't.id = '.$id )
 );
 
 // TODO: Pegar dados da tabela de status
@@ -23,27 +26,26 @@ $status = array(
 
 // PEGA OS USUARIOS
 $users = select(
-	'users u',
-	array( 'u.id','u.name' )
+	'users u', array( 'u.id','u.name' )
 );
 ?>
 <form method="post" onsubmit="return Save.task();">
 	<input type="hidden" name="action" value="edtTask" />
-	<input type="hidden" name="id" value="<?= $_REQUEST['id']; ?>" />
+	<input type="hidden" name="id" value="<?php echo $_REQUEST['id']; ?>" />
 	<div class="response"></div>
 
 	<label for="idUser">Nome:</label><br />
-	<?= mountSelect( $users['data'],'idUser',$task['data'][0]['idUser'] ); ?>
+	<?php echo mountSelect( $users['data'],'idUser',$task['data'][0]['idUser'] ); ?>
 
 	<br /><br />
 
 	<label for="status">Status:</label>
-	<span><?= $status[ $task['data'][0]['idStatus'] ];?></span>
+	<span><?php echo $status[ $task['data'][0]['idStatus'] ]; ?></span>
 
 	<br /><br />
 
 	<label for="text">Descrição:</label><br />
-	<textarea name="text" rows="5"><?= $task['data'][0]['text']; ?></textarea>
+	<textarea name="text" rows="5"><?php echo $task['data'][0]['text']; ?></textarea>
 
 	<br />
 

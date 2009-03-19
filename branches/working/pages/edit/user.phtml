@@ -1,4 +1,4 @@
-<?
+<?php
 // INCLUI O ARQUIVO DE FUNCOES
 require_once('../../includes/config.php');
 require_once('../../includes/functions.php');
@@ -7,7 +7,7 @@ require_once('../../includes/functions.php');
 $conn = connect();
 
 // PEGA O ID DO USUARIO
-$id = $_REQUEST['id'];
+$id = sanitize( $_REQUEST['id'] );
 
 // PEGA OS DADOS DA TASK
 $user = select(
@@ -18,11 +18,11 @@ $user = select(
 ?>
 <form method="post" onsubmit="return Save.user();">
 	<input type="hidden" name="action" value="edtUser" />
-	<input type="hidden" name="id" value="<? echo $id; ?>" />
+	<input type="hidden" name="id" value="<?php echo $id; ?>" />
 	<div class="response"></div>
 
 	<label for="name">Name: </label><br />
-	<input type="text" name="name" value="<? echo $user['data'][0]['name']; ?>" />
+	<input type="text" name="name" value="<?php echo $user['data'][0]['name']; ?>" />
 
 	<br />
 
@@ -40,7 +40,6 @@ $user = select(
 
 <script type="text/javascript">
 	$(function(){
-		var selector = '#colorSet';
-		Get.colorSet( selector,"<? echo $user['data'][0]['idColorSet']; ?>" );
+		Get.colorSet( '#colorSet',"<? echo $user['data'][0]['idColorSet']; ?>" );
 	});
 </script>
