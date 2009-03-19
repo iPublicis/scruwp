@@ -261,6 +261,7 @@ var Struts = {
 			$('#teamSelect').change(function(){
 				var action = this.value ? 'show' : 'hide';
 				$('li.sprint')[ action ]().prev('li')[ action ]();
+				$('li.history')[ action ]().prev('li')[ action ]();
 
 				if( this.value ){
 					$.cookie( 'teamSelect', this.value, { expires: 365 } );
