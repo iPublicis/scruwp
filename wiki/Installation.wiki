@@ -1,0 +1,13 @@
+#labels Phase-Deploy
+= Installation =
+
+ # Download the latest version at the downloads, or do a checkout of the repository;
+ # Charge the initial structure which is on file database.sql;
+ # Fix the MySQL data access in the file includes/config.php;
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
