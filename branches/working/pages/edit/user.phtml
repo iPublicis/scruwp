@@ -21,23 +21,20 @@ $user = select(
 	<input type="hidden" name="id" value="<?php echo $id; ?>" />
 	<div class="response"></div>
 
-	<label for="name">Name: </label><br />
+	<label for="name">Name: </label>
 	<input type="text" name="name" value="<?php echo $user['data'][0]['name']; ?>" />
 
 	<br />
 
-	<label for="color">Color:</label><br />
+	<label for="color">Color:</label>
 	<select id="colorSet" name="idColorSet">
 		<option value="">Select...</option>
 	</select>
 
 	<br /><br />
 
-	<input type="submit" value="Add user" />
+	<input type="submit" value="Save user" />
 </form>
-
-<br />
-
 <script type="text/javascript">
 	$(function(){
 		Get.colorSet( '#colorSet',"<? echo $user['data'][0]['idColorSet']; ?>" );

@@ -867,21 +867,26 @@ var Modal = {
 	initialize: function(){
 		$('#content > a.close').click( Modal.close );
 	},
-	open: function(){
-		$('#backGround').height( $(document).height() )
-			.fadeIn('fast',function(){
-				$('html,body').animate({ scrollTop: 0 }, 'fast', function(){
-					$('#content').fadeIn('fast');
-				});
-			}
-		);
+	fixHeight: function(){
+		var content = $('#content'),
+			main	= $('div.main',content),
+			inner	= main.css('height','auto').height(),
+			outter	= content.height();
+
+		// BACK HEIGHT to 100%
+		main.css('height','100%');
+
+		// CHECK IF THE CONTENT IS SMALLER
+		if( inner < outter ){
+			// ANIMATE THE REDUCT OF THE CONTAINER
+			content.height( inner );
+		}
 	},
 	load: function( url,title,callBack ){
-		this.open();
-
-		var content = $('#content div.main'),
-			index = url.indexOf('?'),
-			param = '';
+		var content = $('#content'),
+			main	= content.children('div.main'),
+			index 	= url.indexOf('?'),
+			param 	= '';
 
 		$('#content span.header').html( title || '' );
 
@@ -891,35 +896,51 @@ var Modal = {
 			url = url.substr( 0,index )
 		}
 
-		$.ajax({
-			url: url,
-			data: param,
-			type: 'POST',
-			cache: false,
-			dataType: 'html',
-			beforeSend: function(){
-				loading( false );
-			},
-			success: function( response ){
-				content.append( response );
-				if( $.isFunction( callBack ) ){
-					callBack();
-				}
-			},
-			error: function( xhr ){
-				content.append('<p>'+ xhr.statusText +'</p>');
-			},
-			complete: function(){
-				loading( true );
+		$('#backGround').fadeIn('fast',function(){
+				$('html').animate({ scrollTop: 0 }, 'fast', function(){
+					content.fadeIn('fast',function(){
+						$.ajax({
+							url: url,
+							data: param,
+							dataType: 'html',
+							type: ( index > -1 ? 'POST' : 'GET' ),
+							beforeSend: function(){
+								loading( false );
+							},
+							success: function( response ){
+								main.append( response );
+								if( $.isFunction( callBack ) ){
+									callBack();
+								}
+							},
+							error: function( xhr ){
+								main.append('<p>'+ xhr.statusText +'</p>');
+							},
+							complete: function(){
+								loading( true );
+								Modal.fixHeight();
+							}
+						});
+					});
+				});
 			}
-		});
+		);
 	},
 	close: function( callBack ){
+		// FADEOUT OF THE CONTENT
 		$('#content').fadeOut( 'fast',function(){
-			$('#content div.main').empty();
+			$(this)
+				// RESIZE TO NATURAL SIZE
+				.css('height','50%')
+				// CLEAN THE CONTENT DIV
+				.children('div.main').empty();
+			// BACK TO SCROLL POSITION
 			$('html').animate({ scrollTop: Modal.position.top }, 'fast', function(){
+				// FADEOUT OF BACKGROUND
 				$('#backGround').fadeOut( 'fast',function(){
+					// RESET THE SCROLL POSITION
 					Modal.position.top = 0;
+					// CALLBACK FUNCTION
 					if( $.isFunction( callBack ) ){
 						callBack();
 					}
@@ -928,6 +949,11 @@ var Modal = {
 		} );
 	}
 };
+
+// FIX THE BACKGROUND HEIGHT
+window.onresize = function(){
+	$('#backGround').height( $(document).height() );
+}
 
 // STRING PROTOTYPES
 String.prototype.dateToPtBr = function(){
@@ -942,13 +968,11 @@ Date.prototype.isSameDay = function( date ){
 			this.getDate() == date.getDate()
 		: null;
 }
-
 Date.prototype.isLesser = function( date ){
 	return date instanceof Date
 		? date.isGreater( this ) && !this.isSameDay( date )
 		: null;
 }
-
 Date.prototype.isGreater = function( date ){
 	return date instanceof Date
 		? this.getFullYear() > date.getFullYear()
@@ -965,13 +989,14 @@ Date.prototype.isGreater = function( date ){
 		: null;
 }
 
+// SQL ERROR MESSAGE
 function printError(cod,message,sql){
  	if( $.browser.mozilla && typeof window.console == 'object' ){
-		console.group( 'MySQL Error' );
+		console.group('MySQL Error');
 			console.error( cod,': ',message );
 			if( sql )
 				console.info( sql );
-		console.groupEnd();
+		console.groupEnd('MySQL Error');
 	} else {
 		alert( cod + ': ' + message );
 		if( sql ){
@@ -980,6 +1005,7 @@ function printError(cod,message,sql){
 	}
 }
 
+// TOGGLE MODAL LOADING
 function loading( remove ){
 	var content = $( 'div.main' );
 	if( remove ){

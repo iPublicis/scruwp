@@ -3,12 +3,12 @@
 	<input type="hidden" name="idSprint" value="" />
 	<div class="response"></div>
 
-	<label for="name">Nome:</label><br />
+	<label for="name">Name:</label>
 	<input type="text" name="name" value="" maxlength="255" />
 
 	<br />
 
-	<label for="estimate">Estimativa:</label><br />
+	<label for="estimate">Estimate:</label>
 	<select name="estimate">
 		<option value="0">0</option>
 		<option value="1">1</option>
@@ -24,19 +24,16 @@
 
 	<br /><br />
 
-	<label for="text">Descrição:</label><br />
+	<label for="text">Description:</label>
 	<textarea name="text" rows="5"></textarea>
 
 	<br />
 
-	<input type="submit" value="Adicionar" />
+	<input type="submit" value="Add history" />
 </form>
-
-<br />
-
 <script type="text/javascript">
 	$(function(){
-		$(':hidden[name=idSprint]').val(
+		$('#content input:hidden[name=idSprint]').val(
 			$('#sprintSelect').val()
 		);
 	});
