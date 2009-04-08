@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+// error_reporting(0);
 
 function connect(){
 	$conn = mysql_connect( DB_HOST,DB_USER,DB_PASS );
@@ -29,6 +29,22 @@ function printError( $return = false, $message = false ){
 	} else {
 		echo $buf;
 		return false;
+	}
+}
+
+function implodeRecursive($glue = '',$array = array()){
+	if( is_array($array) ){
+		$buffer = '';
+		foreach( $array as $arrayChild ){
+			if( is_array( $arrayChild ) ){
+				$buffer = implodeRecursive($glue,$arrayChild);
+			} else {
+				$buffer = $arrayChild;
+			}
+		}
+		return $buffer;
+	} else {
+		return implode($glue,$array);
 	}
 }
 
@@ -77,7 +93,8 @@ function query( $query ){
 		$data = array();
 
 		while( $buf = mysql_fetch_assoc( $result ) ){
-			$data[] = $buf;
+			$id = isset( $buf['id'] ) ? $buf['id'] : $i++;
+			$data[ $id ] = $buf;
 		}
 
 		return array(
@@ -139,7 +156,8 @@ function select( $table = false, $fields = false, $where = false ){
 		$data = array();
 
 		while( $buf = mysql_fetch_assoc( $result ) ){
-			$data[] = array_map( sanitize,$buf );
+			$id = isset( $buf['id'] ) ? $buf['id'] : $i++;
+			$data[ $id ] = array_map( sanitize,$buf );
 		}
 
 		return array(

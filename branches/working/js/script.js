@@ -101,7 +101,28 @@ var Struts = {
 
 		// TASK IMAGES MOUSE EVENTS
 		$('span.dragBox').live('mouseover',function(){
-			$(this).children('img').show();
+			// SELECT THE JQUERY OBJECT
+			var span = $(this);
+			// SHOW ALL IMAGES INSIDE
+			span.children('img').show();
+			// CHECK IS DRAGGABLE IS ENABLED
+			if( !span.hasClass('.ui-draggable') ){
+				console.info('initDraggable');
+				// ENABLE DRAGGABLE
+				span.draggable({
+					zIndex: 666,
+					opacity: 0.7,
+					revert: true,
+					cursor: 'move',
+					grid: [10, 10],
+					stop:function(e,ui){
+						ui.helper.css({
+							'top':'0px',
+							'left':'0px'
+						});
+					}
+				});
+			}
 		}).live('mouseout',function(){
 			$(this).children('img').hide();
 		});
@@ -440,25 +461,6 @@ var Struts = {
 						'border-top' : '1px solid #'+ this.border
 					});
 			});
-
-			// IF DONT NEDD TO SET THE DRAGGABLE
-			if( !active ) return false;
-
-			$('span.dragBox:not(.ui-draggable)').each(function(){
-				$(this).draggable({
-					zIndex: 666,
-					opacity: 0.7,
-					revert: true,
-					cursor: 'move',
-					grid: [10, 10],
-					stop:function(e,ui){
-						ui.helper.css({
-							'top':'0px',
-							'left':'0px'
-						});
-					}
-				});
-			});
 		}
 	}
 };
@@ -487,9 +489,11 @@ var Add = {
 	task: function(){
 		Modal.load(
 			'pages/add/task.html','Add Task',function(){
-				$('#content div.main')
-					.find('select').val( Struts.task.data.status ).parent()
-					.find('input:hidden[name=history]').val( Struts.task.data.history );
+				$(function(){
+					$('#content div.main')
+						.find('select').val( Struts.task.data.status ).parent()
+						.find('input:hidden[name=history]').val( Struts.task.data.history );
+					});
 			}
 		);
 	}
