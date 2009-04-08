@@ -12,9 +12,12 @@ $id = sanitize( $_REQUEST['id'] );
 // PEGA OS DADOS DA TASK
 $task = select(
 	'tasks t',
-	array( 't.idHistory','t.idStatus','t.idUser','t.text' ),
+	array( 't.id','t.idHistory','t.idStatus','t.idUser','t.text' ),
 	array( 't.id = '.$id )
 );
+
+// CORRIGE O ARRAY DE DADOS
+$task['data'] = array_shift( $task['data'] );
 
 // TODO: Pegar dados da tabela de status
 // MONTA O ARRAY DE STATUS
@@ -36,17 +39,17 @@ $users = select(
 	<div class="response"></div>
 
 	<label for="idUser">Owner:</label>
-	<?= mountSelect( $users['data'],'idUser',$task['data'][0]['idUser'] ); ?>
+	<?= mountSelect( $users['data'],'idUser',$task['data']['idUser'] ); ?>
 
 	<br /><br />
 
 	<label for="status">Status:</label>
-	<span><?= $status[ $task['data'][0]['idStatus'] ];?></span>
+	<span><?= $status[ $task['data']['idStatus'] ];?></span>
 
 	<br /><br />
 
 	<label for="text">Description:</label>
-	<textarea name="text" rows="5"><?= $task['data'][0]['text']; ?></textarea>
+	<textarea name="text" rows="5"><?= $task['data']['text']; ?></textarea>
 
 	<br />
 

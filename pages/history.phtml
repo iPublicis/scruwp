@@ -1,0 +1,83 @@
+<?php
+// INCLUI O ARQUIVO DE FUNCOES
+require_once('../includes/config.php');
+require_once('../includes/functions.php');
+
+// CONECTA NO BANCO DE DADOS
+$conn = connect();
+
+// PEGA O ID DO SPRINT
+$idSprint = isset($_REQUEST['idSprint']) ? $_REQUEST['idSprint'] : false;
+
+// SE NAO TIVER O ID DO SPRINT MORRE
+if( !$idSprint )
+	die('<p class="error">Invalid parameters;</p>');
+
+// PEGA OS DADOS DAS HISTORIAS
+$histories = select(
+	'histories h',
+	array( 'h.id','h.name','h.text','h.estimate' ),
+	array( 'h.idSprint = '.$idSprint )
+);
+
+// PEGA OS DADOS DOS USUARIOS
+$usuarios = select(
+	'users u',
+	array( 'u.id','u.name' )
+);
+
+// PERCORRE AS HISTORIAS
+foreach( $histories['data'] as $data ){
+	// PEGA O ID DA HISTORIA
+	$idHistory = $data['id'];
+	// PEGA AS TAKS DA HISTORIA
+	$histories['data'][ $idHistory ]['tasks'] = select(
+		'tasks t',
+		array( 't.id','t.idUser','t.idStatus','t.text' ),
+		array( 't.idHistory = '.$idHistory )
+	);
+	// MONTA OS STATUS DE TASKS
+	$histories['data'][ $idHistory ]['status'] = array(
+		'1' => array(), '2' => array(), '3' => array()
+	);
+	// ORDENA AS TASKS POR STATUS
+	foreach( $histories['data'][ $idHistory ]['tasks']['data'] as $task ){
+		$histories['data'][ $idHistory ]['status'][ $task['idStatus'] ][] = '<span id="task_'. $task['id'] .'" class="dragBox">'.
+			'<span class="text">'. $task['text'] .'</span>'.
+			'<span class="name">'. $usuarios['data'][ $task['idUser'] ]['name'] .'</span>'.
+		'</span>';
+	}
+}
+
+// INSTANCIA A VARIAVEL DE SAIDA
+$buf = array();
+
+foreach( $histories['data'] as $data ){
+	$buf[] = '<tr class="history '. $data['id'] .'">'.
+		'<td class="description">'.
+			'<img title="Delete history" alt="X" class="deleteHistory" src="images/history/delete.png" style="display:none;"/>'.
+			'<img title="Colapse history" alt="-" class="colapseHistory" src="images/history/history.png" style="display:none;"/>'.
+			'<span>'.
+				'<sup>'. $data['estimate'] .'</sup>'.
+				'<b>'. $data['name'] .'</b>'.
+				'<br /><i>'. $data['text'] .'</i>'.
+			'</span>'.
+		'</td>'.
+		'<td class="box">'.
+			'<img class="addTask" title="Add task" alt="+" src="images/notes/add.png" style="display: none;" />'.
+			implode( "\n",$data['status'][1] ).
+		'</td>'.
+		'<td class="box">'.
+			'<img class="addTask" title="Add task" alt="+" src="images/notes/add.png" style="display: none;" />'.
+			implode( "\n",$data['status'][2] ).
+		'</td>'.
+		'<td class="box">'.
+			'<img class="addTask" title="Add task" alt="+" src="images/notes/add.png" style="display: none;" />'.
+			implode( "\n",$data['status'][3] ).
+		'</td>'.
+	'</tr>';
+}
+
+// ESCREVE A LINHA NA TELA
+echo implode("\n",$buf);
+?>
