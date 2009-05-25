@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 
 function connect(){
 	$conn = mysql_connect( DB_HOST,DB_USER,DB_PASS );
@@ -10,7 +10,7 @@ function connect(){
 		}
 		return $conn;
 	} else {
-		printError();
+		return printError();
 	}
 }
 
@@ -33,7 +33,15 @@ function printError( $return = false, $message = false ){
 }
 
 function sanitize( $buf ){
-	return str_replace( '"',"'", str_replace( "\n",' ',$buf ) );
+	return strip_tags( addslashes(
+		str_replace( "\n",' ',$buf )
+	) );
+}
+
+function revSanitize( $buf ){
+	return stripslashes(
+		str_replace('"', "'", $buf )
+	);
 }
 
 function toMysql( $date = false ){
@@ -41,6 +49,13 @@ function toMysql( $date = false ){
 		return $date;
 
 	return implode( "-",array_reverse( explode( "/",$date ) ) );
+}
+
+function fromMysql( $date = false ){
+	if( !$date )
+		return $date;
+
+	return implode( "/",array_reverse( explode( "-",$date ) ) );
 }
 
 function startTransaction(){
@@ -93,7 +108,7 @@ function insert( $table = false, $fields = false, $values = false ){
 				$table.
 					' ('. implode( ',',$fields ) .') '.
 				' VALUES '.
-					' ("'. implode( '","',$values ) .'");';
+					' ("'. implode( '","', array_map( sanitize, $values ) ) .'");';
 
 	$query = mysql_query( $sql );
 
@@ -154,7 +169,7 @@ function update( $table = false, $values = false, $where = false ){
 	$sql = 'UPDATE '.$table.' SET ';
 
 	foreach( $values as $field => $value ){
-		$sql .= ( $i++ ? ',' : '' ).$field.' = "'. $value .'"';
+		$sql .= ( $i++ ? ',' : '' ).$field.' = "'. sanitize( $value ) .'"';
 	}
 
 	$sql .= ( $where && is_array( $where )
@@ -179,8 +194,10 @@ function delete( $table = false, $where = false ){
 
 	$query = mysql_query( $sql );
 
+	$isOk = $query && ( mysql_errno() == '0' || mysql_affected_rows() > 0 );
+
 	return array(
-		'status' => ( $query && mysql_affected_rows() > 0 ), 'code' => mysql_errno(),
+		'status' => $isOk, 'code' => mysql_errno(),
 		'message' => sanitize( mysql_error() ), 'query' => sanitize( $sql )
 	);
 }
@@ -212,7 +229,7 @@ function toJSON( $return ){
 			$buf .= ( $i++ ? ',' : '' ).'{';
 			$j = 0;
 			foreach( $row as $key => $value ){
-				$buf .= ( $j++ ? ',' : '' ).'"'.$key.'"'.': "'. sanitize( $value ) .'"';
+				$buf .= ( $j++ ? ',' : '' ).'"'.$key.'"'.': "'. $value .'"';
 			}
 			$buf .= '}';
 		}		

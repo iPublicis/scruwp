@@ -79,6 +79,10 @@ div#options div.container ul li a.addUser {
 	background-image: url('../images/user/add.png');
 }
 
+div#options div.container ul li a.edtUser {
+	background-image: url('../images/user/edit.png');
+}
+
 div#options div.container ul li a.addSprint {
 	background-image: url('../images/sprint/add.png');
 }
@@ -289,6 +293,10 @@ div#content a.close {
     background: url('../images/close.png') no-repeat;
 }
 
+div#content form {
+	padding-bottom: 1em;
+}
+
 div#content label {
     font-weight: bold;
 }
@@ -319,15 +327,15 @@ div#content textarea {
     background-color: #FF9999;
     border: 1px solid #330000;
 }
-.info {
-    color: #000099;
-    background-color: #9999FF;
-    border: 1px solid #000033;
-}
 .success {
     color: #006600;
     background-color: #99FF99;
     border: 1px solid #003300;
+}
+.info {
+    color: #000099;
+    background-color: #9999FF;
+    border: 1px solid #000033;
 }
 
 /* GENERAL */

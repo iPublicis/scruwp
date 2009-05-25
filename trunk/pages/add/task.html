@@ -3,7 +3,7 @@
 	<input type="hidden" name="history" value="" />
 	<div class="response"></div>
 
-	<label for="userAddTask"><b>User:</b></label>
+	<label for="userAddTask">Owner:</label>
 	<select name="userAddTask">
 		<option value="">Select...</option>
 		<optgroup label="Users"></optgroup>
@@ -11,26 +11,23 @@
 
 	<br /><br />
 
-	<label for="status">Status:</label><br />
+	<label for="status">Status:</label>
 	<select name="status">
-		<option value="">Selecione...</option>
-		<option value="1">todo</option>
-		<option value="2">wip</option>
-		<option value="3">done</option>
+		<option value="">Select...</option>
+		<option value="1">Todo</option>
+		<option value="2">Wip</option>
+		<option value="3">Done</option>
 	</select>
 
 	<br /><br />
 
-	<label for="text">Descrição:</label><br />
+	<label for="text">Description:</label>
 	<textarea name="text" rows="5"></textarea>
 
 	<br />
 
-	<input type="submit" value="Adicionar" />
+	<input type="submit" value="Add task" />
 </form>
-
-<br />
-
 <script type="text/javascript">
 	$(function(){
 		Get.user( '#content select[name=userAddTask]' );

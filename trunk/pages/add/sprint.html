@@ -3,35 +3,34 @@
 	<input type="hidden" name="idTeam" value="" />
 	<div class="response"></div>
 
-	<label for="beginDate">Data Inicio: </label><br />
+	<label for="beginDate">Begin date: </label>
 	<input type="text" name="beginDate" value="" />
 
 	<br />
 
-	<label for="duration">Duração: </label><br />
+	<label for="duration">Duration: </label>
 	<select name="duration">
-		<option value="">Selecione...</option>
-		<option value="1">1 Semana</option>
-		<option value="2">2 Semanas</option>
-		<option value="3">3 Semanas</option>
+		<option value="">Select...</option>
+		<option value="1">1 Week</option>
+		<option value="2">2 Week</option>
+		<option value="3">3 Week</option>
 	</select>
 
 	<br /><br />
 
-	<label for="status">Ativo: </label><br />
+	<label for="status">Active: </label>
 	<select name="status">
-		<option value="0" selected="selected">Não</option>
-		<option value="1">Sim</option>
+		<option value="0" selected="selected">No</option>
+		<option value="1">Yes</option>
 	</select>
 
 	<br /><br />
 
-	<input type="submit" value="Adicionar" />
+	<input type="submit" value="Add sprint" />
 </form>
-<br />
 <script type="text/javascript">
 	$(function(){
-		$(':hidden[name=idTeam]').val(
+		$('#content input:hidden[name=idTeam]').val(
 			$('#teamSelect').val()
 		);
 	});

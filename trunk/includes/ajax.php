@@ -12,6 +12,7 @@ switch( $_REQUEST['action'] ){
 	// USER
 	case 'addUser': addUser(); break;
 	case 'getUser': getUser(); break;
+	case 'edtUser': edtUser(); break;
 	// SPRINT
 	case 'addSprint': addSprint(); break;
 	case 'getSprint': getSprint(); break;
@@ -90,35 +91,67 @@ function getUser(){
 	}
 }
 
+function edtUser(){
+	$return = update(
+		'users', array(
+			'idColorSet' => $_REQUEST['idColorSet'],
+			'name' => $_REQUEST['name'],
+		), array( 'id = '.$_REQUEST['id'] )
+	);
+
+	echo '{ code: ', $return['code'] ,', action: "', $_REQUEST['action'] ,'", id: ', $_REQUEST['id'] ,
+		', message: "',$return['message'],( $return['query'] ? '", query: "'.$return['query'] : '' ),
+	'" }';
+}
+
 // SPRINT
 
 function addSprint(){
-	//TODO: Adicionar transacao
-	$update['status'] = true;
+	// DEFAULT STATUS
+	$update['status'] = false;
+	$return['status'] = false;
 
-	if( $_REQUEST['status'] )
-		$update = update( 'sprints',
-			array( 'status' => 0 ), array( 'idTeam = '.$_REQUEST['idTeam'] )
-		);
+	// START THE SQL TRANSACTION
+	if( startTransaction() ){
+		// CHECK IF HAS THE DEFAULT FLAG
+		if( $_REQUEST['status'] ){
+			// CLEAR THE ACTIVE FLAG
+			$update = update( 'sprints',
+				array( 'status' => 0 ), array( 'idTeam = '.$_REQUEST['idTeam'] )
+			);
+		} else {
+			$update['status'] = true;
+		}
 
-	if( $update['status'] ){
-		$endDate = date( 'Y-m-d',(
-			strtotime( toMysql($_REQUEST['beginDate']) ) + ( 604800 * $_REQUEST['duration'] )
-		) );
+		// IF THE FIRST UPDATE IS OK
+		if( $update['status'] ){
+			// CALC THE WEEKS IN SECONDS
+			$endDate = date( 'Y-m-d',(
+				strtotime( toMysql($_REQUEST['beginDate']) ) + ( 604800 * $_REQUEST['duration'] )
+			) );
 
-		$return = insert(
-			'sprints', array( 'idTeam','status','beginDate','endDate' ),
-			array( $_REQUEST['idTeam'],$_REQUEST['status'],toMysql($_REQUEST['beginDate']),$endDate )
-		);
-	} else {
-		$return = array(
-			'id' => 0,
-			'code' => 1
-		);
+			// INSERT THE SPRINT
+			$return = insert(
+				'sprints', array( 'idTeam','status','beginDate','endDate' ),
+				array( $_REQUEST['idTeam'],$_REQUEST['status'],toMysql($_REQUEST['beginDate']),$endDate )
+			);
+		}
 	}
 
+	// CHECK THE STATUS OS THE QUERIES
+	if( $update['status'] && $return['status'] ){
+		// SAVE THE CHANGES
+		commitTransaction();
+	} else {
+		// DONT SAVE IT :P 
+		rollbackTransaction();
+		// DEFAULT ERROR STATUS
+		$return = array( 'code' => 1, 'id' => 0 );
+	}
+
+	// ECHO THE JSON RESPONSE
 	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',(
-		$return['code'] ? 'error' : 'Ok!'
+		$return['code'] ? 'Error' : 'Ok!'
 	),'" }';
 }
 
@@ -137,21 +170,37 @@ function getSprint(){
 }
 
 function defaultSprint(){
-	//TODO: Adicionar transacao
+	// DEFAULT STATUS
 	$update['status'] = false;
-	$update = update( 'sprints',array( 'status' => 0 ) );
 
-	if( $update['status'] ){
-		$return = update(
-			'sprints',array( 'status' => 1 ),array( 'id = '.$_REQUEST['id'] )
+	// START THE SQL TRANSACTION
+	if( startTransaction() ){
+		// RESET THE DEFAULT STATUS
+		$update = update(
+			'sprints', array( 'status' => 0 ), array( 'idTeam = '. $_REQUEST['idTeam'] )
 		);
-	} else {
-		$return = array(
-			'code' => 1,
-			'message' => 'error'
-		);
+
+		// IF THE UPDATE IS OK
+		if( $update['status'] ){
+			// CHANGE THE STATUS
+			$return = update(
+				'sprints', array( 'status' => 1 ), array( 'id = '.$_REQUEST['id'] )
+			);
+		}
 	}
 
+	// CHECK THE STATUS OS THE QUERIES
+	if( $update['status'] && $return['status'] ){
+		// SAVE THE CHANGES
+		commitTransaction();
+	} else {
+		// DONT SAVE IT :P 
+		rollbackTransaction();
+		// DEFAULT ERROR STATUS
+		$return = array( 'code' => 1, 'id' => 0 );
+	}
+
+	// ECHO THE JSON RESPONSE
 	echo '{ code: ', $return['code'] ,', message: "',( $return['code'] ? 'error' : 'Ok!' ),'" }';
 }
 
@@ -210,13 +259,15 @@ function deleteHistory(){
 			);
 
 			if( is_array( $history ) && $history['status'] ){
-				echo '{ code: 0, message: "Ok!" }';
-				return commitTransaction();
+				if( commitTransaction() ){
+					echo '{ code: 0, message: "Yeah, history deleted with success!" }';
+					return true;
+				}
 			}
 		}
 	}
 
-	echo '{ code: 1, message: "Error!" }';
+	echo '{ code: 1, message: "Ops! The history wasn\'t removed." }';
 	return rollbackTransaction();
 }
 
@@ -239,11 +290,10 @@ function getHistoryBySprint(){
 function addTask(){
 	$return = insert(
 		'tasks',
-		array( 'idHistory','idStatus','idUser','name','text','color' ),
+		array( 'idHistory','idStatus','idUser','text' ),
 		array(
 			$_REQUEST['history'], $_REQUEST['status'],
-			$_REQUEST['userAddTask'], $_REQUEST['name'],
-			$_REQUEST['text'], $_REQUEST['color']
+			$_REQUEST['userAddTask'], $_REQUEST['text']
 		)
 	);
 
