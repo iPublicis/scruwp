@@ -1,3 +1,26 @@
+Version 0.6.2:
+	* Histories only can be added on the active sprint;
+	* Resize the Modal if the content is smaller;
+	* Some minor layout fix on all Modal pages;
+	* Added the option 0 in story estimate;
+	* Update the sanitize function;
+
+	BUG Fix: 
+		* Translate all Modal pages to english;
+		* Fix the remove history problem;	# Issue 9
+		* Fix the problem with the active sprint on several teams;
+		* Force hidding the inside images from the task after dragging; 
+
+Version 0.6.1:
+	* Update jQuery to 1.3.2;
+	* Update jQuery UI to 1.7;
+	* Added the User Edit feature;
+	* Added the sanitize function on every query;
+
+	BUG Fix:
+		* Now form are send by POST ( Ops! :P )
+		* Add history link doesn't appear without a sprint selected;	# Issue 8
+
 Version 0.6.0:
 	* Scroll top for modal and back when close it;
 	* Add the edit task option;				# Issue 4
@@ -10,8 +33,8 @@ Version 0.6.0:
 
 	BUGS Fix:
 		* Changed all the form to POST;
-		* Fix the background height;		# Issue: 3
-		* Fix the history remove button;	# Issue: 5
+		* Fix the background height;		# Issue 3
+		* Fix the history remove button;	# Issue 5
 
 Version 0.5.1:
 	* Change to jQuery 1.3.1;
@@ -20,7 +43,7 @@ Version 0.5.1:
 	* Options menu out off table's thead;
 	* Ajax.complete clear the messages;
 	* Add the progressbar for the sprint time elapsed;
-	* Now stories can be colapsed;			# Issue: 1
+	* Now stories can be colapsed;			# Issue 1
 	* Add the Date.prototypes;
 	* Add the CSS for jQuery UI;
 

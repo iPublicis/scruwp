@@ -5,7 +5,7 @@
 		<link rel="shortcut icon" href="favicon.ico">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8;"/>
 		<link rel="stylesheet" href="css/layout.css" type="text/css" media="all" />
-		<link rel="stylesheet" href="css/themes/base/ui.all.css" type="text/css" media="all" />
+		<link rel="stylesheet" href="css/jquery.ui-1.7.css" type="text/css" media="all" />
     </head>
     <body>
     	<div id="header">
@@ -42,6 +42,9 @@
 							<ul>
 								<li>
 									<a href="javascript:void(0);" class="addUser link">Add user</a>
+								</li>
+								<li class="edtUser">
+									<a href="javascript:void(0);" class="edtUser link">Edit user</a>
 								</li>
 							</ul>
 						</li>
@@ -124,10 +127,10 @@
 		</div>
     </body>
 	<head>
-        <script type="text/javascript" src="js/jquery.1.3.1.min.js"></script>
-        <script type="text/javascript" src="js/jquery.ui.all.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.ui-1.7.min.js"></script>
         <script type="text/javascript" src="js/jquery.cookie.js"></script>
-        <script type="text/javascript" src="js/script.js?<?= rand() ?>"></script>
+        <script type="text/javascript" src="js/script.js"></script>
 		<script type="text/javascript">
 			$( Struts.init );
 		</script>
