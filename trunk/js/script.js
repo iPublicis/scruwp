@@ -29,6 +29,10 @@ var Struts = {
 				$('#loading').fadeOut();
 			}
 		});
+		// CENTRALIZE THE LOADING MESSAGE
+		$('#loading').css('margin-left','-' + (
+			$('#loading').width() / 2
+		) + 'px');
 		// COLAPSE ALL HISTORIES
 		$('#colapseAll').click(function(){
 			$('span.dragBox')[
@@ -37,9 +41,6 @@ var Struts = {
 		});
 	},
 	initLiveEvents: function(){
-		// CLEAR THE CONTAINER MESSAGE
-		Show.container.live( 'click',Show.clear );
-
 		// COLAPSE HISTORY
 		$('img.colapseHistory').live('click',function(){
 			$(this).parent().parent().find('span.dragBox').toggle();
@@ -53,23 +54,15 @@ var Struts = {
 			);
 		});
 
-		// HISTORY IMAGES MOUSE EVENTS
-		$('td.description').live('mouseover',function(){
-			$( this ).children('img').show();
-		}).live('mouseout',function(){
-			$( this ).children('img').hide();
-		});
-
 		// IMAGE ADD TASK
 		$('img.addTask').live('click',function(e){
 			var offset = $(e.target).offset();
 
-			Modal.position.top =
+			Modal.status.positionTop =
 				offset.top > window.innerHeight ? offset.top : 0;
 
 		 	Struts.task.data = {
-				history: $(this).parents('tr').data('id'),
-				status: $(this).parent().data('status')
+				history: $(this).parents('tr').data('id')
 			};
 
 			Add.task();
@@ -79,7 +72,7 @@ var Struts = {
 		$('img.editTask').live('click',function(e){
 			var offset = $(e.target).offset();
 
-			Modal.position.top =
+			Modal.status.positionTop =
 				offset.top > window.innerHeight ? offset.top : 0;
 
 			Edit.task( $(this).parent().data('task') );
@@ -176,7 +169,7 @@ var Struts = {
 						'border': '1px solid #000000',
 						'border-bottom': ' 1px solid #DDDDDD' }
 					: { 'border': '1px solid #000000' }
-			);
+			).toggleClass('ui-corner-all').toggleClass('ui-corner-top');
 		}).mouseover(function(){
 			if( $(this).siblings('div.container').is(':visible') )
 				return false;
@@ -295,9 +288,12 @@ var Struts = {
 		initSelectAction: function(){
 			$('#sprintSelect').change(function(){
 				var active = $('option:selected',this).data('status'), 
-					action = this.value && active ? 'show' : 'hide';
+					action = this.value && active ? 'show' : 'hide',
+					actDef = this.value && !active ? 'show' : 'hide';
 
-				$('li.history')[ action ]().prev('li')[ action ]();
+				$('li.history','#options')[ action ]().prev('li')[ action ]();
+
+				$('li.sprint li:last','#options')[ actDef ]();
 
 				if( this.value ){
 					Get.historyBySprint( this.value );
@@ -309,10 +305,10 @@ var Struts = {
 		},
 		mountSelect: function( dados ){
 			var selected = false;
-			$('#sprintSelect > optgroup:first > option').remove();
+			$('optgroup:first > option','#sprintSelect').remove();
 
 			if( !dados.length )
-				$('#sprintSelect > optgroup:first').append(
+				$('optgroup:first','#sprintSelect').append(
 					'<option value="">...</option>'
 				);
 
@@ -321,7 +317,7 @@ var Struts = {
 					selected = this.id;
 				}
 
-				$('#sprintSelect > optgroup:first').append(
+				$('optgroup:first','#sprintSelect').append(
 					'<option value="'+ this.id +'">#'+ this.id +'</option>'
 				).children('option:last')
 					.data( 'status',parseInt(this.status) )
@@ -337,12 +333,6 @@ var Struts = {
 			// VERIFY IF THE SPRINT IS THE ACTIVE
 			var active = $('#sprintSelect option:selected').data('status'),
 
-			// IMG TEMPLATE
-			image = '<img src="images/notes/add.png" alt="+" title="Add task" class="addTask" />',
-			
-			// TD.BOX TEMPLATE
-			tdBox = '<td class="box">'+ ( active ? image : '' ) +'</td>',
-
 			// GET THE TABLE
 			tbody = $('#main > tbody');
 
@@ -351,7 +341,10 @@ var Struts = {
 				tbody.append(
 					'<tr class="history '+ hist.id +'">' +
 						'<td class="description">' +
-							( active ? '<img src="images/history/delete.png" class="deleteHistory" alt="X" title="Delete history" />' : '' ) +
+							( !active ? '' :
+								'<img src="images/notes/add.png" alt="+" title="Add task" class="addTask" />'+
+								'<img src="images/history/delete.png" class="deleteHistory" alt="X" title="Delete history" />'
+							) +
 							'<img src="images/history/history.png" class="colapseHistory" alt="-" title="Colapse history" />' +
 							'<span>'+
 								'<sup>'+ hist.estimate +'</sup>&nbsp;'+
@@ -359,11 +352,10 @@ var Struts = {
 							'</span>'+
 							'<br /><i>' + hist.text + '</i>' +
 						'</td>' +
-						tdBox + tdBox + tdBox +
+						'<td class="box" /><td class="box" /><td class="box" />'+
 					'</tr>'
-				).find('tr.'+ hist.id).data('id',hist.id)
-				 .find('img').hide();
-				 
+				).find('tr.'+ hist.id).data('id',hist.id);
+
 				// SET THE STATUS IN THE TD
 				tbody.find('tr.'+ hist.id +' td.box').each(function(i){
 					$(this).data('status',( i + 1 ));
@@ -376,35 +368,32 @@ var Struts = {
 			if( !active ) return false;
 
 			// MAKE THE ADD TASK ACTIONS
-			$('#main > tbody td.box:not(.ui-droppable)').each(function(){
-				// MAKE THE TD A DROPZONE
-				$(this).droppable({
-					hoverClass: 'hoverBox',
-					accept: 'span.dragBox',
-					drop: function(e, ui) {
-						// PEGA OS IDS DE HISTORIA
-						var id = ui.draggable.data('history');
-						var history = ui.draggable.parents('tr').data('id');
+			$('#main > tbody td.box:not(.ui-droppable)').droppable({
+				hoverClass: 'hoverBox',
+				accept: 'span.dragBox',
+				drop: function(e, ui) {
+					// PEGA OS IDS DE HISTORIA
+					var id = ui.draggable.data('history');
+					var history = ui.draggable.parents('tr').data('id');
 
-						// CANCELA SE A HISTORIA FOR DIFERENTE
-						if( id != history )
-							return false;
+					// CANCELA SE A HISTORIA FOR DIFERENTE
+					if( id != history )
+						return false;
 
-						// SALVA O STATUS DA TASK
-						Save.taskStatus( ui.draggable,$(e.target) );
+					// SALVA O STATUS DA TASK
+					Save.taskStatus( ui.draggable,$(e.target) );
 
-						if( window.statusJSON ){
-							// INSERE A TASK NA TABELA
-							$(this).append( ui.helper.css({
-								'top':'0px',
-								'left':'0px'
-							}) );
-						}
-
-						// RETURN THE STATUS
-						return window.statusJSON;
+					if( window.statusJSON ){
+						// INSERE A TASK NA TABELA
+						$(this).append( ui.helper.css({
+							'top':'0px',
+							'left':'0px'
+						}) );
 					}
-				});
+
+					// RETURN THE STATUS
+					return window.statusJSON;
+				}
 			});
 		}
 	},
@@ -412,16 +401,16 @@ var Struts = {
 		data: {},
 		mount: function( dados ){
 			// GET SPRINT'S ACTIVE STATUS
-			var active = $('#sprintSelect option:selected').data('status'),
+			var active = $('option:selected','#sprintSelect').data('status'),
 				cookieUser = $.cookie('userSelect');
 
 			$.each( dados,function(i){
 				if( cookieUser && cookieUser != this.idUser )
 					return true;
 
-				var tds = $('#main > tbody > tr.'+ this.idHistory +' > td:eq('+ this.idStatus +')')
+				$('tr.'+ this.idHistory +' td:eq('+ this.idStatus +')','#main')
 					.append(
-						'<span id="task_'+ this.id +'" class="dragBox">' +
+						'<span id="task_'+ this.id +'" class="dragBox ui-corner-all">' +
 							'<span class="text">' + this.text + '</span>' +
 							'<span class="name">' + this.name + '</span>' +
 							( active ? '<img src="images/notes/delete.png" class="deleteTask" alt="X" title="Delete task" />' : '' ) +
@@ -437,7 +426,7 @@ var Struts = {
 					.data( 'status',this.idStatus )
 					.data( 'task',this.id )
 					.hide().fadeIn('slow')
-					.children('img.deleteTask,img.editTask').hide()
+					.find('img').hide()
 					.siblings('span.name').css({
 						'border-top' : '1px solid #'+ this.border
 					});
@@ -446,21 +435,20 @@ var Struts = {
 			// IF DONT NEDD TO SET THE DRAGGABLE
 			if( !active ) return false;
 
-			$('span.dragBox:not(.ui-draggable)').each(function(){
-				$(this).draggable({
-					zIndex: 666,
-					opacity: 0.7,
-					revert: true,
-					cursor: 'move',
-					grid: [10, 10],
-					stop:function(e,ui){
-						ui.helper.css({
-							'top':'0px',
-							'left':'0px'
-						}).mouseout();
-						// PREVENT FROM THE INSIDE IMAGES STAY VISIBLE
-					}
-				});
+			// MAKE THE TASKS DRAGGABLE
+			$('span.dragBox:not(.ui-draggable)').draggable({
+				zIndex: 666,
+				opacity: 0.7,
+				revert: true,
+				cursor: 'move',
+				grid: [10, 10],
+				stop:function(e,ui){
+					ui.helper.css({
+						'top':'0px',
+						'left':'0px'
+					}).mouseout();
+					// PREVENT FROM THE INSIDE IMAGES STAY VISIBLE
+				}
 			});
 		}
 	}
@@ -490,9 +478,7 @@ var Add = {
 	task: function(){
 		Modal.load(
 			'pages/add/task.html','Add Task',function(){
-				$('#content div.main')
-					.find('select').val( Struts.task.data.status ).parent()
-					.find('input:hidden[name=history]').val( Struts.task.data.history );
+				$('input:hidden[name=history]','#content').val( Struts.task.data.history );
 			}
 		);
 	}
@@ -523,7 +509,7 @@ var Get = {
 	colorSet: function( selector,value ){
 		$.ajax({
 			cache: false,
-			type: 'POST',
+			type: 'GET',
 			dataType: 'json',
 			url: 'includes/ajax.php',
 			data: ( 'action=getColorSet' ),
@@ -535,7 +521,7 @@ var Get = {
 	team: function( id ){
 		$.ajax({
 			cache: false,
-			type: 'POST',
+			type: 'GET',
 			dataType: 'json',
 			url: 'includes/ajax.php',
 			data: ( 'action=getTeam' ),
@@ -547,7 +533,7 @@ var Get = {
 	user: function( selector ){
 		$.ajax({
 			cache: false,
-			type: 'POST',
+			type: 'GET',
 			dataType: 'json',
 			url: 'includes/ajax.php',
 			data: ( 'action=getUser' ),
@@ -560,18 +546,16 @@ var Get = {
 		});
 	},
 	sprintByTeam: function( id ){
-		$('#main > tbody > tr').remove();
-
-		if( !id )
-			return false;
+		if( !id ) return false;
 
 		$.ajax({
 			cache: false,
-			type: 'POST',
+			type: 'GET',
 			dataType: 'json',
 			url: 'includes/ajax.php',
 			data: ( 'action=getSprintByTeam&id=' + id ),
 			success: function( json ){
+				$('#main > tbody > tr').remove();
 				Struts.sprint.mountSelect( json.data || [] );
 			}
 		});
@@ -584,7 +568,7 @@ var Get = {
 
 		$.ajax({
 			cache: false,
-			type: 'POST',
+			type: 'GET',
 			dataType: 'json',
 			url: 'includes/ajax.php',
 			data: ( 'action=getHistoryBySprint&id=' + id ),
@@ -594,12 +578,11 @@ var Get = {
 		});
 	},
 	history: function( id ){
-		if( !id )
-			return false;
+		if( !id ) return false;
 
 		$.ajax({
 			cache: false,
-			type: 'POST',
+			type: 'GET',
 			dataType: 'json',
 			url: 'includes/ajax.php',
 			data: ( 'action=getHistory&id=' + id ),
@@ -609,12 +592,11 @@ var Get = {
 		});
 	},
 	task: function( id ){
-		if( !id )
-			return false;
+		if( !id ) return false;
 
 		$.ajax({
 			cache: false,
-			type: 'POST',
+			type: 'GET',
 			dataType: 'json',
 			url: 'includes/ajax.php',
 			data: ( 'action=getTask&id=' + id ),
@@ -626,12 +608,11 @@ var Get = {
 		return false;
 	},
 	taskByHistory: function( id ){
-		if( !id )
-			return false;
+		if( !id ) return false;
 
 		$.ajax({
 			cache: false,
-			type: 'POST',
+			type: 'GET',
 			dataType: 'json',
 			url: 'includes/ajax.php',
 			data: ( 'action=getTaskByHistory&id=' + id ),
@@ -804,7 +785,7 @@ var Save = {
 
 var Delete = {
 	history: function( id,history ) {
-		if( confirm( 'Deseja remover a estória?' ) ){
+		if( confirm( 'Remove the history?' ) ){
 			$.ajax({
 				cache: false,
 				type: 'POST',
@@ -819,54 +800,88 @@ var Delete = {
 				}
 			});
 		}
-
-		return false;
 	},
 	task: function( id,task ){
-		if( confirm( 'Deseja remover a task?' ) ){
+		if( confirm( 'Remove the task?' ) ){
 			$.ajax({
 				cache: false,
 				type: 'POST',
 				dataType: 'json',
 				url: 'includes/ajax.php',
-				data: ( 'action=deleteTask&id='+ id ),
+				data: ( 'action=deleteTask&id='+ id +'&status='+ task.data('status') ),
 				success: function( json ){
 					if( json.code == 0 ){
-						task.fadeOut( 'slow' );
+						task.fadeOut( 'slow' ).remove();
 					}
 				}
 			});
 		}
-		return false;
 	}
 };
 
 var Show = {
 	container: {},
+	span: {},
 	init: function(){
 		// CONTAINER FOR MESSAGES
-		Show.container = $('#main tfoot td:eq(1)');
+		Show.container = $('#message');
+
+		// SPAN FOR THE MESSAGES TEXT
+		Show.span = $('span','#message');
+
+		// BIND THE ACTION OF THE CLOSE MESSAGE
+		Show.span.siblings('img').click(function(){
+			// HIDE THE MESSAGE 
+			Show.container.fadeOut('fast',function(){
+				// CLEAR THE MESSAGE
+				Show.clear();
+			});
+		});
 	},
 	info: function( msg ){
+		// SHOW THE INFO MESSAGE
 		Show.message( msg,'info' );
 	},
 	success: function( msg ){
+		// SHOW THE SUCCESS MESSAGE
 		Show.message( msg,'success' );
 	},
 	error: function( msg ){
+		// SHOW THE ERROR MESSAGE
 		Show.message( msg,'error' );
 	},
 	message: function( msg,css ){
-		Show.clear().html( msg ).addClass( css +' pointer' );
+		// CHECK THE CONTENT OF THE MESSAGE
+		if( msg == '' ) return false;
+
+		// CLEAR AND SET THE NEW MESSAGE
+		Show.clear().html( msg );
+
+		// CENTRALIZE THE MESSAGE
+		Show.centralize();
+
+		// SET THE STYLE AND SHOW
+		Show.container.addClass( css +' ui-corner-all' ).fadeIn('fast');
+	},
+	centralize: function(){
+		// GET THE HALF WIDTH OF THE MESSAGE
+		var width = Show.container.width() / 2;
+
+		// CENTRALIZE THE CONTAINER
+		Show.container.css('margin-left','-'+ width +'px');
 	},
 	clear: function(){
-		return Show.container.empty().removeClass();
+		// HIDE AND CLEAR THE STYLE
+		Show.container.hide().removeClass();
+		// CLEAR THE OLD MESSAGE
+		return Show.span.html('');
 	}
 };
 
 var Modal = {
-	position: {
-		top: 0
+	status: {
+		positionTop: 0,
+		type: 'small'
 	},
 	initialize: function(){
 		$('#content > a.close').click( Modal.close );
@@ -875,16 +890,28 @@ var Modal = {
 		var content = $('#content'),
 			main	= $('div.main',content),
 			inner	= main.css('height','auto').height(),
-			outter	= content.height();
+			bigger	= inner < content.height(),
+			isSmall	= Modal.status.type == 'small';
 
-		// BACK HEIGHT to 100%
+		// RESET THE MAIN SIZE
 		main.css('height','100%');
 
 		// CHECK IF THE CONTENT IS SMALLER
-		if( inner < outter ){
+		if( bigger && isSmall && content.is(':visible') ){
 			// ANIMATE THE REDUCT OF THE CONTAINER
-			content.height( inner );
+			content.css('height','50%').animate({ height: inner },'slow');
 		}
+	},
+	loadBigger: function( url,title,callBack ){
+		// CHANGE THE MODAL TYPE
+		Modal.status.type = 'bigger';
+
+		// FIX THE CSS FOR THE BIGGER MODAL
+		$('#content')
+			.css({ height:'80%', width: '80%', left: '10%', top: '5%' });
+
+		// LOAD THE PAGE
+		Modal.load( url,title,callBack );
 	},
 	load: function( url,title,callBack ){
 		var content = $('#content'),
@@ -892,7 +919,7 @@ var Modal = {
 			index 	= url.indexOf('?'),
 			param 	= '';
 
-		$('#content span.header').html( title || '' );
+		$('span.header','#content').html( title || '' );
 
 		// VERIFY FOR PARAMETERS
 		if( index > -1 ){
@@ -900,7 +927,7 @@ var Modal = {
 			url = url.substr( 0,index )
 		}
 
-		$('#backGround').fadeIn('fast',function(){
+		$('#backGround').height( $(document).height() ).fadeIn('fast',function(){
 				$('html').animate({ scrollTop: 0 }, 'fast', function(){
 					content.fadeIn('fast',function(){
 						$.ajax({
@@ -913,6 +940,9 @@ var Modal = {
 							},
 							success: function( response ){
 								main.append( response );
+
+								Modal.fixHeight();
+
 								if( $.isFunction( callBack ) ){
 									callBack();
 								}
@@ -922,7 +952,6 @@ var Modal = {
 							},
 							complete: function(){
 								loading( true );
-								Modal.fixHeight();
 							}
 						});
 					});
@@ -935,15 +964,21 @@ var Modal = {
 		$('#content').fadeOut( 'fast',function(){
 			$(this)
 				// RESIZE TO NATURAL SIZE
-				.css('height','50%')
+				.css({ height:'50%', width: '50%', left: '25%', top: '25%' })
+
 				// CLEAN THE CONTENT DIV
 				.children('div.main').empty();
+
 			// BACK TO SCROLL POSITION
-			$('html').animate({ scrollTop: Modal.position.top }, 'fast', function(){
+			$('html').animate({ scrollTop: Modal.status.positionTop }, 'fast', function(){
 				// FADEOUT OF BACKGROUND
 				$('#backGround').fadeOut( 'fast',function(){
 					// RESET THE SCROLL POSITION
-					Modal.position.top = 0;
+					Modal.status.positionTop = 0;
+
+					// RESET THE MODAL TYPE
+					Modal.status.type = 'small';
+
 					// CALLBACK FUNCTION
 					if( $.isFunction( callBack ) ){
 						callBack();
@@ -958,6 +993,7 @@ var Modal = {
 window.onresize = function(){
 	// FIX THE BACKGROUND HEIGHT
 	$('#backGround').height(0).height( $(document).height() );
+
 	// FIX THE MODAL HEIGHT
 	Modal.fixHeight();
 }

@@ -79,7 +79,7 @@ function addUser(){
 
 function getUser(){
 	$return = selectToJSON(
-		'users', array( '*' )
+		'users', array( '*' ), false, array('name')
 	);
 
 	if( is_array( $return ) ){
@@ -201,7 +201,11 @@ function defaultSprint(){
 	}
 
 	// ECHO THE JSON RESPONSE
-	echo '{ code: ', $return['code'] ,', message: "',( $return['code'] ? 'error' : 'Ok!' ),'" }';
+	echo '{ code: ', $return['code'] ,', message: "',(
+		$return['code']
+			? 'Has been a error while trying to make this the default sprint'
+			: 'The sprint #'. $_REQUEST['id'] .' is now the default!'
+	),'" }';
 }
 
 function getSprintByTeam(){
@@ -249,11 +253,22 @@ function getHistory(){
 
 function deleteHistory(){
 	if( startTransaction() ){
-		$tasks = delete(
-			'tasks', array( 'idHistory = '.$_REQUEST['id'] )
+		$tasks = select(
+			'tasks', array('*'), array( 'idHistory = '.$_REQUEST['id'] )
 		);
+		
+		$isTasksDeleted = true;
 
-		if( is_array( $tasks ) && $tasks['status'] ){
+		foreach( $tasks['data'] as $task ){
+			$deleted = deleteTask( $task );
+
+			if( !$deleted['status'] ){
+				$isTasksDeleted = false;
+				break;
+			}
+		}
+
+		if( $isTasksDeleted ){
 			$history = delete(
 				'histories', array( 'id = '.$_REQUEST['id'] )
 			);
@@ -288,18 +303,32 @@ function getHistoryBySprint(){
 // TASKS
 
 function addTask(){
-	$return = insert(
-		'tasks',
-		array( 'idHistory','idStatus','idUser','text' ),
-		array(
-			$_REQUEST['history'], $_REQUEST['status'],
-			$_REQUEST['userAddTask'], $_REQUEST['text']
-		)
-	);
+	if( startTransaction() ){
+		$return = insert(
+			'tasks',
+			array( 'idHistory','idStatus','idUser','text' ),
+			array(
+				$_REQUEST['history'], $_REQUEST['status'],
+				$_REQUEST['userAddTask'], $_REQUEST['text']
+			)
+		);
 
-	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',$return['message'],(
-			$return['query'] ? '", query: "'.$return['query'] : ''
-		),'" }';
+		if( $return['status'] )
+			$log = insert(
+				'tasks_log', array( 'idTask','oldStatus','newStatus' ),
+				array( $return['id'], 0, 1 )
+			);
+	}
+
+	if( $return['status'] && $log['status'] ){
+		commitTransaction();
+	} else {
+		rollbackTransaction();
+	}
+
+	echo '{ code: ', $return['code'] ,', id: ', $return['id'] ,', message: "',(
+		$return['code'] ? '' : ''
+	),'" }';
 }
 
 function getTask(){
@@ -331,14 +360,30 @@ function getTask(){
 	}
 }
 
-function deleteTask(){
-	$return = delete(
-		'tasks', array( 'id = '.$_REQUEST['id'] )
-	);
+function deleteTask($option = false){
+	$task = $option ? $option : $_REQUEST;
 
-	echo '{ code: ', $return['code'] ,', message: "',$return['message'],(
-			$return['query'] ? '", query: "'.$return['query'] : ''
-		),'" }';
+	if( startTransaction() ){
+		$return = insert(
+			'tasks_log', array( 'idTask','oldStatus','newStatus' ),
+			array( $task['id'], $task['status'], 0 )
+		);
+
+		if( $return['status'] )
+			$return = delete( 'tasks', array( 'id = '.$task['id'] ) );
+	}
+
+	if( $return['status'] ){
+		commitTransaction();
+	} else {
+		rollbackTransaction();
+	}
+
+	if( $option ){
+		return $return;
+	} else {
+		echo '{ code: ', $return['code'] ,', message: "',$return['message'],'" }';
+	}
 }
 
 function getTaskByHistory(){
@@ -384,21 +429,29 @@ function edtTask(){
 }
 
 function saveStatus(){
-	$return = insert(
-		'tasks_log', array( 'idTask','oldStatus','newStatus' ),
-		array( $_REQUEST['id'],$_REQUEST['oldStatus'],$_REQUEST['status'] )
-	);
-
-	if( $return['status'] ){
-		$return = update(
-			'tasks', array(
-				'idStatus' => $_REQUEST['status'],
-			), array( 'id = '.$_REQUEST['id'] )
+	if( startTransaction() ){
+		$return = insert(
+			'tasks_log', array( 'idTask','oldStatus','newStatus' ),
+			array( $_REQUEST['id'],$_REQUEST['oldStatus'],$_REQUEST['status'] )
 		);
+
+		if( $return['status'] ){
+			$return = update(
+				'tasks', array(
+					'idStatus' => $_REQUEST['status'],
+				), array( 'id = '.$_REQUEST['id'] )
+			);
+		}
 	}
 
-	echo '{ code: ', $return['code'] ,', message: "',$return['message'],(
-		$return['query'] ? '", query: "'.$return['query'] : ''
+	if( $return['status'] ){
+		commitTransaction();
+	} else {
+		rollbackTransaction();
+	}
+
+	echo '{ code: ', $return['code'] ,', message: "',(
+		$return['code'] ? 'Has been a error while trying to save the task; Ops!' : '' 
 	),'" }';
 }
 

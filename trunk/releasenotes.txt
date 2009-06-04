@@ -1,3 +1,14 @@
+Version 0.7.0:
+	* Adding the log on add task;
+	* New style for loading container;
+	* Messages container fixed on top;
+	* Tasks now only be added on TODO status;
+	* Only show make default on non defaults sprints; 
+
+	BUG Fix:
+		* Fix some Modal resize issues;
+		* Tasks that was only hidden now is really removed from DOM;
+
 Version 0.6.2:
 	* Histories only can be added on the active sprint;
 	* Resize the Modal if the content is smaller;
