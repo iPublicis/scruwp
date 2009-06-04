@@ -46,7 +46,7 @@ $users = select(
 	<br /><br />
 
 	<label for="text">Description:</label>
-	<textarea name="text" rows="5"><?= stripslashes( $task['data'][0]['text'] ); ?></textarea>
+	<textarea name="text" rows="5"><?= $task['data'][0]['text'] ?></textarea>
 
 	<br />
 

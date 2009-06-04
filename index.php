@@ -11,8 +11,8 @@
     	<div id="header">
     		<h1>Scruwp :: Scrum With PHP</h1>
 			<div id="options">
-				<span class="button">Options</span>
-				<div class="container" style="display: none;">
+				<span class="button ui-corner-all">Options</span>
+				<div class="container ui-corner-tl ui-corner-bottom" style="display: none;">
 					<ul>
 						<li class="team">
 							<nobr>
@@ -108,22 +108,20 @@
     			</tr>
     		</thead>
 			<tbody></tbody>
-			<tfoot>
-    			<tr>
-    				<td></td>
-    				<td colspan="2">&nbsp;</td>
-    				<td align="right"></td>
-    			</tr>
-			</tfoot>
     	</table>
-    	<div id="loading" style="display:none;">
-    		<img src="images/loading.gif" alt="" title="Carregando..." />
+		<div id="message" style="display:none;">
+			<img src="images/close.png" alt=" X " title="Close" class="pointer" />
+			<span>aeiufaiufei uhaieufh aieuhf iauei auhef</span>
+		</div>
+    	<div id="loading" class="ui-corner-all" style="display:none;">
+    		<img src="images/loading.gif" alt="" title="Loading..." />
+			<span>Loading...</span>
     	</div>
 		<div id="backGround" style="display:none;"></div>
-		<div id="content" style="display:none;">
+		<div id="content" class="ui-corner-all" style="display:none;">
 			<span class="header">&nbsp;</span>
 			<a href="javascript:void(0);" class="close">CLOSE</a>
-			<div class="main">&nbsp;</div>
+			<div class="main ui-corner-bottom">&nbsp;</div>
 		</div>
     </body>
 	<head>

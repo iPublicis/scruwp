@@ -125,7 +125,7 @@ function insert( $table = false, $fields = false, $values = false ){
 	}
 }
 
-function select( $table = false, $fields = false, $where = false ){
+function select( $table = false, $fields = false, $where = false,$orderBy = false ){
 	if( !$table || !is_array( $fields ) ){
 		return array(
 			'status' => false, 'code' => 1, 'message' => 'Invalid Parameters'
@@ -137,7 +137,9 @@ function select( $table = false, $fields = false, $where = false ){
 			' FROM '.
 				$table.
 			( is_array( $where ) && count( $where ) ?
-				' WHERE '.implode( ' AND ',$where ) : '' ).';';
+				' WHERE '.implode( ' AND ',$where ) : '' ).
+			( is_array( $orderBy ) && count( $orderBy ) ?
+				' ORDER BY '.implode( ' , ',$orderBy ) : '' ).';';
 
 	$result = mysql_query( $sql );
 
@@ -202,8 +204,8 @@ function delete( $table = false, $where = false ){
 	);
 }
 
-function selectToJSON( $table = false, $fields = false, $where = false ){
-	$return = select( $table, $fields, $where );
+function selectToJSON( $table = false, $fields = false, $where = false, $orderBy = false ){
+	$return = select( $table, $fields, $where, $orderBy );
 
 	if( $return['status'] ){
 		return toJSON( $return );
@@ -229,7 +231,7 @@ function toJSON( $return ){
 			$buf .= ( $i++ ? ',' : '' ).'{';
 			$j = 0;
 			foreach( $row as $key => $value ){
-				$buf .= ( $j++ ? ',' : '' ).'"'.$key.'"'.': "'. $value .'"';
+				$buf .= ( $j++ ? ',' : '' ).'"'.$key.'"'.': "'. revSanitize( $value ) .'"';
 			}
 			$buf .= '}';
 		}		

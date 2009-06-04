@@ -12,12 +12,38 @@ div#header h1 {
     margin: 0px 5px;
 }
 
+div#loading,
+div#message {
+	top: 3px;
+	left: 50%;
+	z-index: 444;
+	padding: 3px;
+	font-size: 13px;
+	position: fixed;
+}
+div#loading img,
+div#message img {
+	position: absolute;
+	top: 3px;
+}
+
 /* LOADING */
 div#loading {
-    padding: 3px;
-    position: absolute;
-    top: 0px;
-    right: 50%;
+	background-color: #EEEEEE;
+	border: 1px solid #CCCCCC;
+	padding-left: 22px;
+	color: #333333;
+}
+div#loading img {
+	left: 2px;
+}
+
+/* MESSAGE CENTER */
+div#message {
+	padding-right: 22px;
+}
+div#message img {
+	right: 2px;
 }
 
 /* PROGRESSBAR */
@@ -137,7 +163,9 @@ table#main tbody tr.history td {
 }
 
 table#main tbody tr td.description img.deleteHistory,
-table#main tbody tr td.description img.colapseHistory {
+table#main tbody tr td.description img.colapseHistory,
+table#main tbody tr td.description img.addTask {
+	margin-left: 2px;
     cursor: pointer;
     float: right;
 }
@@ -153,10 +181,13 @@ table#main tbody tr td.box img.addTask {
 }
 
 table#main tbody tr td.hoverBox {
-    border: 1px solid #CCCCCC;
+	border-width: 0px 0px 1px 1px;
     background-color: #DDDDDD;
+    border-color: #CCCCCC;
+	border-style: solid;
 }
 
+/*
 table#main tfoot td {
     padding: 3px;
     vertical-align: top;

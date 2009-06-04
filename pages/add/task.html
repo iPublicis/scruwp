@@ -1,22 +1,13 @@
 <form method="post" onsubmit="return Save.task();">
 	<input type="hidden" name="action" value="addTask" />
 	<input type="hidden" name="history" value="" />
+	<input type="hidden" name="status" value="1" />
 	<div class="response"></div>
 
 	<label for="userAddTask">Owner:</label>
 	<select name="userAddTask">
 		<option value="">Select...</option>
 		<optgroup label="Users"></optgroup>
-	</select>
-
-	<br /><br />
-
-	<label for="status">Status:</label>
-	<select name="status">
-		<option value="">Select...</option>
-		<option value="1">Todo</option>
-		<option value="2">Wip</option>
-		<option value="3">Done</option>
 	</select>
 
 	<br /><br />
