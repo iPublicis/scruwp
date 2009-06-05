@@ -1,3 +1,9 @@
+Version 0.7.1:
+	* Removed the short tag for compatibility;
+
+	BUG Fix:
+		* Removed the test message from the index page;
+
 Version 0.7.0:
 	* Adding the log on add task;
 	* New style for loading container;

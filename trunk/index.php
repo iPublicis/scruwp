@@ -111,7 +111,7 @@
     	</table>
 		<div id="message" style="display:none;">
 			<img src="images/close.png" alt=" X " title="Close" class="pointer" />
-			<span>aeiufaiufei uhaieufh aieuhf iauei auhef</span>
+			<span></span>
 		</div>
     	<div id="loading" class="ui-corner-all" style="display:none;">
     		<img src="images/loading.gif" alt="" title="Loading..." />

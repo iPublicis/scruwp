@@ -32,21 +32,21 @@ $users = select(
 ?>
 <form method="post" onsubmit="return Save.task();">
 	<input type="hidden" name="action" value="edtTask" />
-	<input type="hidden" name="id" value="<?= $_REQUEST['id']; ?>" />
+	<input type="hidden" name="id" value="<? echo $_REQUEST['id']; ?>" />
 	<div class="response"></div>
 
 	<label for="idUser">Owner:</label>
-	<?= mountSelect( $users['data'],'idUser',$task['data'][0]['idUser'] ); ?>
+	<? echo mountSelect( $users['data'],'idUser',$task['data'][0]['idUser'] ); ?>
 
 	<br /><br />
 
 	<label for="status">Status:</label>
-	<span><?= $status[ $task['data'][0]['idStatus'] ];?></span>
+	<span><? echo $status[ $task['data'][0]['idStatus'] ];?></span>
 
 	<br /><br />
 
 	<label for="text">Description:</label>
-	<textarea name="text" rows="5"><?= $task['data'][0]['text'] ?></textarea>
+	<textarea name="text" rows="5"><? echo $task['data'][0]['text'] ?></textarea>
 
 	<br />
 
