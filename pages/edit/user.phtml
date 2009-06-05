@@ -18,11 +18,11 @@ $user = select(
 ?>
 <form method="post" onsubmit="return Save.user();">
 	<input type="hidden" name="action" value="edtUser" />
-	<input type="hidden" name="id" value="<?= $id; ?>" />
+	<input type="hidden" name="id" value="<? echo $id; ?>" />
 	<div class="response"></div>
 
 	<label for="name">Name: </label>
-	<input type="text" name="name" value="<?= stripslashes( $user['data'][0]['name'] ); ?>" />
+	<input type="text" name="name" value="<? echo stripslashes( $user['data'][0]['name'] ); ?>" />
 
 	<br />
 
@@ -37,6 +37,6 @@ $user = select(
 </form>
 <script type="text/javascript">
 	$(function(){
-		Get.colorSet( '#colorSet',"<?= $user['data'][0]['idColorSet']; ?>" );
+		Get.colorSet( '#colorSet',"<? echo $user['data'][0]['idColorSet']; ?>" );
 	});
 </script>
