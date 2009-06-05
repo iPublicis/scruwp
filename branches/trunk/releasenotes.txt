@@ -1,0 +1,113 @@
+Version 0.7.1:
+	* Removed the short tag for compatibility;
+
+	BUG Fix:
+		* Removed the test message from the index page;
+
+Version 0.7.0:
+	* Adding the log on add task;
+	* New style for loading container;
+	* Messages container fixed on top;
+	* Tasks now only be added on TODO status;
+	* Only show make default on non defaults sprints; 
+
+	BUG Fix:
+		* Fix some Modal resize issues;
+		* Tasks that was only hidden now is really removed from DOM;
+
+Version 0.6.2:
+	* Histories only can be added on the active sprint;
+	* Resize the Modal if the content is smaller;
+	* Some minor layout fix on all Modal pages;
+	* Added the option 0 in story estimate;
+	* Update the sanitize function;
+
+	BUG Fix: 
+		* Translate all Modal pages to english;
+		* Fix the remove history problem;	# Issue 9
+		* Fix the problem with the active sprint on several teams;
+		* Force hidding the inside images from the task after dragging; 
+
+Version 0.6.1:
+	* Update jQuery to 1.3.2;
+	* Update jQuery UI to 1.7;
+	* Added the User Edit feature;
+	* Added the sanitize function on every query;
+
+	BUG Fix:
+		* Now form are send by POST ( Ops! :P )
+		* Add history link doesn't appear without a sprint selected;	# Issue 8
+
+Version 0.6.0:
+	* Scroll top for modal and back when close it;
+	* Add the edit task option;				# Issue 4
+	* Translated the options menu;
+	* Add animation to ProgressBar;
+	* Add the User managment;
+	* Add the task color by user;
+	* Parameters to Modal;
+	* Color + Icon change in Modal close;
+
+	BUGS Fix:
+		* Changed all the form to POST;
+		* Fix the background height;		# Issue 3
+		* Fix the history remove button;	# Issue 5
+
+Version 0.5.1:
+	* Change to jQuery 1.3.1;
+	* Several JS improvments;
+	* Team selection persistence by cookie;
+	* Options menu out off table's thead;
+	* Ajax.complete clear the messages;
+	* Add the progressbar for the sprint time elapsed;
+	* Now stories can be colapsed;			# Issue 1
+	* Add the Date.prototypes;
+	* Add the CSS for jQuery UI;
+
+Version 0.5:
+	* Team managment;
+	* Options button;
+	* Make default sprint;
+	* Change addHistory place to options;
+	* Some tweak fix for performace;
+
+	BUGS fix:
+		* Wrong task position after scrolling the page;
+
+Version 0.4:
+	* Add Sprint menu;
+	* Add sprint default action;
+	* Add the begin/end date on screen;
+	* Add onClick to clear the messages;
+	* Actions (history/task) only work on active sprint;
+
+Version 0.3:
+	* Add history images;
+	* Add log from tasks;
+	* Add Sprint management;
+	* Add delete history/tasks;
+
+	BUGS fix:
+		* Tasks doesn't break when go outside the window;
+		* Removed task color black for reading propouses;
+
+Version 0.2.2:
+	* Added the favicon icon;
+
+Version 0.2.1;
+	* Added Estimate in history data;
+	* Added color to add/get tasks;
+	* Added the MySQL dump database;
+	* Corrected ths tasks images;
+	* Minor CSS fix;
+
+Version 0.2;
+	* Add/Get History
+	* Add/Get/Update Task
+	* Modal update
+	* JS Modulation
+	* PHP Functions
+	* Add the release notes file;
+	
+Version 0.1:
+	* Added the base files;

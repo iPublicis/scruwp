@@ -1,0 +1,26 @@
+<form method="post" onsubmit="return Save.task();">
+	<input type="hidden" name="action" value="addTask" />
+	<input type="hidden" name="history" value="" />
+	<input type="hidden" name="status" value="1" />
+	<div class="response"></div>
+
+	<label for="userAddTask">Owner:</label>
+	<select name="userAddTask">
+		<option value="">Select...</option>
+		<optgroup label="Users"></optgroup>
+	</select>
+
+	<br /><br />
+
+	<label for="text">Description:</label>
+	<textarea name="text" rows="5"></textarea>
+
+	<br />
+
+	<input type="submit" value="Add task" />
+</form>
+<script type="text/javascript">
+	$(function(){
+		Get.user( '#content select[name=userAddTask]' );
+	});
+</script>

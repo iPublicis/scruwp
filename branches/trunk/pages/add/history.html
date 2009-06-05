@@ -1,0 +1,40 @@
+<form method="post" onsubmit="return Save.history();">
+	<input type="hidden" name="action" value="addHistory" />
+	<input type="hidden" name="idSprint" value="" />
+	<div class="response"></div>
+
+	<label for="name">Name:</label>
+	<input type="text" name="name" value="" maxlength="255" />
+
+	<br />
+
+	<label for="estimate">Estimate:</label>
+	<select name="estimate">
+		<option value="0">0</option>
+		<option value="1">1</option>
+		<option value="2">2</option>
+		<option value="3">3</option>
+		<option value="5">5</option>
+		<option value="8">8</option>
+		<option value="13">13</option>
+		<option value="20">20</option>
+		<option value="40">40</option>
+		<option value="100">100</option>
+	</select>
+
+	<br /><br />
+
+	<label for="text">Description:</label>
+	<textarea name="text" rows="5"></textarea>
+
+	<br />
+
+	<input type="submit" value="Add history" />
+</form>
+<script type="text/javascript">
+	$(function(){
+		$('#content input:hidden[name=idSprint]').val(
+			$('#sprintSelect').val()
+		);
+	});
+</script>

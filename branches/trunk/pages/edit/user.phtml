@@ -1,0 +1,42 @@
+<?php
+// INCLUI O ARQUIVO DE FUNCOES
+require_once('../../includes/config.php');
+require_once('../../includes/functions.php');
+
+// CONECTA NO BANCO DE DADOS
+$conn = connect();
+
+// PEGA O ID DO USUARIO
+$id = sanitize( $_REQUEST['id'] );
+
+// PEGA OS DADOS DA TASK
+$user = select(
+	'users u',
+	array( 'u.idColorSet','u.name' ),
+	array( 'u.id = '.$id )
+);
+?>
+<form method="post" onsubmit="return Save.user();">
+	<input type="hidden" name="action" value="edtUser" />
+	<input type="hidden" name="id" value="<? echo $id; ?>" />
+	<div class="response"></div>
+
+	<label for="name">Name: </label>
+	<input type="text" name="name" value="<? echo stripslashes( $user['data'][0]['name'] ); ?>" />
+
+	<br />
+
+	<label for="color">Color:</label>
+	<select id="colorSet" name="idColorSet">
+		<option value="">Select...</option>
+	</select>
+
+	<br /><br />
+
+	<input type="submit" value="Save user" />
+</form>
+<script type="text/javascript">
+	$(function(){
+		Get.colorSet( '#colorSet',"<? echo $user['data'][0]['idColorSet']; ?>" );
+	});
+</script>
