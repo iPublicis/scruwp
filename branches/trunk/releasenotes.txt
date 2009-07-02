@@ -1,6 +1,8 @@
 Version 0.7.2:
 	* Improved some performance;
+	* Change some task's margin;
 	* Added the project name on title and header;
+	* Modal is has now fixed position insted of absolute;
 
 Version 0.7.1:
 	* Removed the short tag for compatibility;

@@ -168,7 +168,7 @@ table#main thead #colapseAll {
 }
 
 table#main tbody tr.history td {
-    padding: 5px;
+    padding: 3px;
     vertical-align: top;
     border-bottom: 1px solid #CCCCCC;
 }
@@ -198,41 +198,11 @@ table#main tbody tr td.hoverBox {
 	border-style: solid;
 }
 
-/*
-table#main tfoot td {
-    padding: 3px;
-    vertical-align: top;
-}
-
-table#main tfoot input,
-table#main tfoot textarea {
-    margin-left: 5%;
-    width: 90%;
-}
-
-table#main tfoot td img.sprint {
-    cursor: pointer;
-    padding: 3px;
-}
-
-table#main tfoot td img.actSprint {
-    position: relative;
-    margin-left: 3px;
-    cursor: pointer;
-    right: 3px;
-    top: 3px;
-}
-
-table#main tfoot td div.sprintOpt {
-    position: absolute;
-    right: 0px;
-}
-
 /* DRAGGABLE */
 span.dragBox {
     width: 80px;
     height: 70px;
-    margin: 3px 0 0 3px;
+    margin: 1px;
     padding: 1px;
     font-size: 10px;
     display: inline-block;
@@ -291,7 +261,7 @@ div#content {
     height: 50%;
     left: 25%;
     padding-top: 36px;
-    position: absolute;
+    position: fixed;
     top: 25%;
     width: 50%;
     z-index: 666;
