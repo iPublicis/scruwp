@@ -1,7 +1,8 @@
+<?php include_once('includes/config.php'); ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
     <head>
-        <title>[ scruwp :: Scrum With PHP ]</title>
+        <title>[ scruwp :: <?php echo PROG_NAME; ?> ]</title>
 		<link rel="shortcut icon" href="favicon.ico">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8;"/>
 		<link rel="stylesheet" href="css/layout.css" type="text/css" media="all" />
@@ -9,9 +10,9 @@
     </head>
     <body>
     	<div id="header">
-    		<h1>Scruwp :: Scrum With PHP</h1>
+    		<h1>Scruwp :: <?php echo PROG_NAME; ?></h1>
 			<div id="options">
-				<span class="button ui-corner-all">Options</span>
+				<span class="button options ui-corner-all">Options</span>
 				<div class="container ui-corner-tl ui-corner-bottom" style="display: none;">
 					<ul>
 						<li class="team">
@@ -125,7 +126,7 @@
 		</div>
     </body>
 	<head>
-        <script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.3.2.js"></script>
         <script type="text/javascript" src="js/jquery.ui-1.7.min.js"></script>
         <script type="text/javascript" src="js/jquery.cookie.js"></script>
         <script type="text/javascript" src="js/script.js"></script>

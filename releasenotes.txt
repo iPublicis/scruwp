@@ -1,3 +1,7 @@
+Version 0.7.2:
+	* Improved some performance;
+	* Added the project name on title and header;
+
 Version 0.7.1:
 	* Removed the short tag for compatibility;
 

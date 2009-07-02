@@ -85,18 +85,11 @@ var Struts = {
 			);
 		});
 
-		// TASK ADD MOUSE EVENTS
-		$('td.box').live('mouseover',function(){
-			$(this).children('img.addTask').show();
-		}).live('mouseout',function(){
-			$(this).children('img.addTask').hide();
-		});
-
 		// TASK IMAGES MOUSE EVENTS
 		$('span.dragBox').live('mouseover',function(){
-			$(this).children('img').show();
+			$(this).find('img').show();
 		}).live('mouseout',function(){
-			$(this).children('img').hide();
+			$(this).find('img').hide();
 		});
 	},
 	sprintBar: {
@@ -155,50 +148,39 @@ var Struts = {
 		}
 	},
 	menu: function(){
-		var thOptions 	= $('#options');
-		var spanBtn		= thOptions.children('span.button');
-
-		thOptions.children('div.container').css({
-			top: spanBtn.position().top + spanBtn.outerHeight() - 1
-		});
-
-		spanBtn.click(function(){
-			$(this).css(
-				$(this).siblings('div.container').toggle().is(':visible')
-					? { 'background-color': '#DDDDDD',
+		$('#options')
+			.children('div.container').css(
+				'top',(
+					$('span.options','#options').position().top + $('span.options','#options').outerHeight() - 1
+				)
+			)
+			.siblings('span.options').click(function(){
+				if( $(this).toggleClass('ui-corner-all').toggleClass('ui-corner-top').siblings('div.container').toggle().is(':visible') ){
+					$(this).css({
+						'background-color': '#DDDDDD',
 						'border': '1px solid #000000',
-						'border-bottom': ' 1px solid #DDDDDD' }
-					: { 'border': '1px solid #000000' }
-			).toggleClass('ui-corner-all').toggleClass('ui-corner-top');
-		}).mouseover(function(){
-			if( $(this).siblings('div.container').is(':visible') )
-				return false;
+						'border-bottom': ' 1px solid #DDDDDD'
+					});
+				} else {
+					$(this).removeAttr('style');
+				}
+			})
 
-			$(this).css({
-				'background-color': '#DDDDDD',
-				'border': '1px solid #000000'
-			});
-		}).mouseout(function(){
-			if( $(this).siblings('div.container').is(':visible') )
-				return false;
+			// TEAM ACTIONS
+			.end().find('a.addTeam').click( Add.team )
 
-			$(this).css({
-				'background-color': '#FFFFFF',
-				'border': '1px solid #FFFFFF'
-			});
-		});
+			// USER ACTIONS
+			.end().find('a.addUser').click( Add.user )
+			
+			.end().find('a.edtUser').click( Edit.user )
 
-		var menuDiv = 'div.container ';
-		// TEAM ACTIONS
-		$( menuDiv + 'a.addTeam').click( Add.team );
-		// USER ACTIONS
-		$( menuDiv + 'a.addUser').click( Add.user );
-		$( menuDiv + 'a.edtUser').click( Edit.user );
-		// SPRINT ACTIONS
-		$( menuDiv + 'a.addSprint').click( Add.sprint );
-		$( menuDiv + 'a.defaultSprint').click( Save.defaultSprint );
-		// HISTORY ACTIONS
-		$( menuDiv + 'a.addHistory').click( Add.history );
+			// SPRINT ACTIONS
+			.end().find('a.addSprint').click( Add.sprint )
+
+			.end().find('a.defaultSprint').click( Save.defaultSprint )
+
+			// HISTORY ACTIONS
+			.end().find('a.addHistory').click( Add.history );
 	},
 	colorSet: {
 		mountSelect: function( dados,selector,value ){
