@@ -1,6 +1,7 @@
 <?php
 require_once('config.php');
 require_once('functions.php');
+
 header('Content-type: text/x-json;');
 
 $conn = connect();
@@ -9,6 +10,7 @@ switch( $_REQUEST['action'] ){
 	// TEAM
 	case 'addTeam': addTeam(); break;
 	case 'getTeam': getTeam(); break;
+	case 'edtTeam': edtTeam(); break;
 	// USER
 	case 'addUser': addUser(); break;
 	case 'getUser': getUser(); break;
@@ -62,6 +64,18 @@ function getTeam(){
 	} else {
 		echo $return;
 	}
+}
+
+function edtTeam(){
+	$return = update(
+		'teams', array(
+			'name' => $_REQUEST['name'],
+		), array( 'id = '.$_REQUEST['id'] )
+	);
+
+	echo '{ code: ', $return['code'] ,', action: "', $_REQUEST['action'] ,'", id: ', $_REQUEST['id'] ,
+		', message: "',$return['message'],( $return['query'] ? '", query: "'.$return['query'] : '' ),
+	'" }';
 }
 
 // USER

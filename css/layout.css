@@ -8,22 +8,22 @@ html, body {
 }
 
 /* HEADER */
-div#header {
+#header {
 	clear: both;
 }
 
-div#header h1 {
+#header h1 {
     margin: 0px 5px;
 	float: left;
 }
 
 /* OPTIONS MENU */
-div#options {
+#options {
 	float: right;
 	padding: 2px;
 }
 
-div#options span.options {
+#options span.options {
 	background: #FFFFFF url('../images/settings.png') no-repeat 2px 4px;
 	padding: 2px 2px 2px 20px;
 	border: 1px solid #FFFFFF;
@@ -35,12 +35,12 @@ div#options span.options {
 	top: 6px;
 }
 
-div#options span.options:hover {
+#options span.options:hover {
 	background-color: #DDDDDD;
 	border: 1px solid #000000;
 }
 
-div#options div.container {
+#options div.container {
 	background-color: #DDDDDD;
 	border: 1px solid #000000;
 	position: absolute;
@@ -49,50 +49,51 @@ div#options div.container {
 	z-index: 1;
 }
 
-div#options div.container ul {
+#options div.container ul {
 	text-align: left;
 	list-style: none;
 	padding: 2px;
 	margin: 0px;
 }
 
-div#options div.container ul li ul li {
+#options div.container ul li ul li {
 	margin-left: 10px;
 }
 
-div#options div.container a.link {
+#options div.container a.link {
 	background-repeat: no-repeat;
 	background-position: 2px 1px;
 	padding: 2px 2px 2px 22px;
 	font-size: 14px;
 }
 
-div#options div.container ul li a.addTeam {
+#options a.addTeam {
 	background-image: url('../images/team/add.png');
 }
-
-div#options div.container ul li a.addUser {
+#options a.edtTeam {
+	background-image: url('../images/team/edit.png');
+}
+#options a.addUser {
 	background-image: url('../images/user/add.png');
 }
-
-div#options div.container ul li a.edtUser {
+#options a.edtUser {
 	background-image: url('../images/user/edit.png');
 }
-
-div#options div.container ul li a.addSprint {
+#options a.addSprint {
 	background-image: url('../images/sprint/add.png');
 }
-
-div#options div.container ul li a.defaultSprint {
+#options a.defaultSprint {
 	background-image: url('../images/sprint/link.png');
 }
-
-div#options div.container ul li a.addHistory {
+#options a.addHistory {
 	background-image: url('../images/history/add.png');
 }
+#options a.edtHistory {
+	background-image: url('../images/history/edit.png');
+}
 
-div#loading,
-div#message {
+#loading,
+#message {
 	top: 3px;
 	left: 50%;
 	z-index: 444;
@@ -101,33 +102,33 @@ div#message {
 	position: fixed;
 }
 
-div#loading img,
-div#message img {
+#loading img,
+#message img {
 	position: absolute;
 	top: 3px;
 }
 
 /* LOADING */
-div#loading {
+#loading {
 	background-color: #EEEEEE;
 	border: 1px solid #CCCCCC;
 	padding-left: 22px;
 	color: #333333;
 }
-div#loading img {
+#loading img {
 	left: 2px;
 }
 
 /* MESSAGE CENTER */
-div#message {
+#message {
 	padding-right: 22px;
 }
-div#message img {
+#message img {
 	right: 2px;
 }
 
 /* PROGRESSBAR */
-div#progressbar {
+#progressbar {
 	width: 100%;
 	height: 15px;
 }
@@ -244,7 +245,7 @@ span.dragBox span.name {
 }
 
 /* MODAL LAYOUT */
-div#backGround {
+#backGround {
     z-index: 333;
     background-color: #000000;
     position: absolute;
@@ -255,7 +256,7 @@ div#backGround {
     top: 0px;
 }
 
-div#content {
+#content {
     background-color: #CCCCCC;
     border: 1px solid #000000;
     height: 50%;
@@ -267,7 +268,7 @@ div#content {
     z-index: 666;
 }
 
-div#content div.main {
+#content div.main {
     background-color: #FFFFFF;
     border-top: 1px solid #000000;
     border-bottom: 1px solid #000000;
@@ -277,12 +278,12 @@ div#content div.main {
     width: 96%;
 }
 
-div#content div.main div.response {
+#content div.main div.response {
     margin-bottom: 10px;
     padding: 5px;
 }
 
-div#content span.header {
+#content span.header {
     width: 90%;
     overflow: hidden;
     line-height: 18px;
@@ -293,7 +294,7 @@ div#content span.header {
     left: 10px;
 }
 
-div#content a.close {
+#content a.close {
     line-height: 16px;
     font-size: 16px;
     position: absolute;
@@ -305,17 +306,17 @@ div#content a.close {
     background: url('../images/close.png') no-repeat;
 }
 
-div#content form {
+#content form {
 	padding-bottom: 1em;
 }
 
-div#content label {
+#content label {
     font-weight: bold;
 }
 
-div#content input,
-div#content select,
-div#content textarea {
+#content input,
+#content select,
+#content textarea {
     font-size: 17px;
     width: 100%;
 }
