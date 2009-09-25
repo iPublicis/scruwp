@@ -149,12 +149,7 @@ var Struts = {
 	},
 	menu: function(){
 		$('#options')
-			.children('div.container').css(
-				'top',(
-					$('span.options','#options').position().top + $('span.options','#options').outerHeight() - 1
-				)
-			)
-			.siblings('span.options').click(function(){
+			.children('span.options').click(function(){
 				if( $(this).toggleClass('ui-corner-all').toggleClass('ui-corner-top').siblings('div.container').toggle().is(':visible') ){
 					$(this).css({
 						'background-color': '#DDDDDD',
@@ -165,22 +160,48 @@ var Struts = {
 					$(this).removeAttr('style');
 				}
 			})
+			.siblings('div.container').css(
+				'top',(
+					$('span.options','#options').position().top + $('span.options','#options').outerHeight() - 1
+				)
+			)
 
-			// TEAM ACTIONS
-			.end().find('a.addTeam').click( Add.team )
+			// SELECT ALL THE LINKS
+			.find('a.link')
 
-			// USER ACTIONS
-			.end().find('a.addUser').click( Add.user )
-			
-			.end().find('a.edtUser').click( Edit.user )
+				// TEAM ACTIONS
+				.filter('.addTeam').click( Add.team )
 
-			// SPRINT ACTIONS
-			.end().find('a.addSprint').click( Add.sprint )
+			.end()
 
-			.end().find('a.defaultSprint').click( Save.defaultSprint )
+				.filter('.edtTeam').click( Edit.team )
 
-			// HISTORY ACTIONS
-			.end().find('a.addHistory').click( Add.history );
+			.end()
+	
+				// USER ACTIONS
+				.filter('.addUser').click( Add.user )
+
+			.end()
+
+				.filter('.edtUser').click( Edit.user )
+
+			.end()
+	
+				// SPRINT ACTIONS
+				.filter('.addSprint').click( Add.sprint )
+
+			.end()
+
+				.filter('.defaultSprint').click( Save.defaultSprint )
+
+			.end()
+	
+				// HISTORY ACTIONS
+				.filter('.addHistory').click( Add.history )
+
+			.end()
+
+				.filter('.edtHistory').click( Edit.history );
 	},
 	colorSet: {
 		mountSelect: function( dados,selector,value ){
@@ -235,8 +256,8 @@ var Struts = {
 		initSelectAction: function(){
 			$('#teamSelect').change(function(){
 				var action = this.value ? 'show' : 'hide';
-				$('li.sprint')[ action ]().prev('li')[ action ]();
-				$('li.history')[ action ]().prev('li')[ action ]();
+				$('li.sprint,li.history')[ action ]().prev('li')[ action ]();
+				$('a.edtTeam')[ action ]();
 
 				if( this.value ){
 					$.cookie( 'teamSelect', this.value, { expires: 365 } );
@@ -324,8 +345,9 @@ var Struts = {
 					'<tr class="history '+ hist.id +'">' +
 						'<td class="description">' +
 							( !active ? '' :
-								'<img src="images/notes/add.png" alt="+" title="Add task" class="addTask" />'+
-								'<img src="images/history/delete.png" class="deleteHistory" alt="X" title="Delete history" />'
+								'<img src="images/notes/add.png" alt="+" class="addTask" title="Add task" />'+
+								'<img src="images/history/add.png" alt="E" class="edtHistory" title="Edit history" />'+
+								'<img src="images/history/delete.png" alt="X" class="deleteHistory" title="Delete history" />'
 							) +
 							'<img src="images/history/history.png" class="colapseHistory" alt="-" title="Colapse history" />' +
 							'<span>'+
@@ -467,6 +489,17 @@ var Add = {
 };
 
 var Edit = {
+	team: function(){
+		Modal.load(
+			( 'pages/edit/team.phtml?id='+ $('#teamSelect').val() ),'Edit Team'
+		);
+	},
+	history: function(){
+		var id = $(this).parents('tr').data('id') || 0;
+		Modal.load(
+			( 'pages/edit/team.phtml?id='+ id ),'Edit History'
+		);
+	},
 	task: function( id ){
 		Modal.load(
 			( 'pages/edit/task.phtml?id='+ id ),'Edit Task'
@@ -612,14 +645,14 @@ var Save = {
 			type: 'POST',
 			dataType: 'json',
 			url: 'includes/ajax.php',
-			data: $('#content :input').serialize(),
+			data: $(':input','#content').serialize(),
 			success: function( json ){
 				if( json.code == 0 ){
 					Modal.close(function(){
 						Get.team( json.id );
 					});
 				} else {
-					$('#content div.response').addClass('error').html( json.message );
+					$('div.response','#content').addClass('error').html( json.message || 'Error' );
 				}
 			}
 		});
@@ -862,7 +895,6 @@ var Show = {
 
 var Modal = {
 	status: {
-		positionTop: 0,
 		type: 'small'
 	},
 	initialize: function(){
@@ -910,32 +942,30 @@ var Modal = {
 		}
 
 		$('#backGround').height( $(document).height() ).fadeIn('fast',function(){
-				$('html').animate({ scrollTop: 0 }, 'fast', function(){
-					content.fadeIn('fast',function(){
-						$.ajax({
-							url: url,
-							data: param,
-							dataType: 'html',
-							type: ( index > -1 ? 'POST' : 'GET' ),
-							beforeSend: function(){
-								loading( false );
-							},
-							success: function( response ){
-								main.append( response );
+				content.fadeIn('fast',function(){
+					$.ajax({
+						url: url,
+						data: param,
+						dataType: 'html',
+						type: ( index > -1 ? 'POST' : 'GET' ),
+						beforeSend: function(){
+							loading( false );
+						},
+						success: function( response ){
+							main.append( response );
 
-								Modal.fixHeight();
+							Modal.fixHeight();
 
-								if( $.isFunction( callBack ) ){
-									callBack();
-								}
-							},
-							error: function( xhr ){
-								main.append('<p>'+ xhr.statusText +'</p>');
-							},
-							complete: function(){
-								loading( true );
+							if( $.isFunction( callBack ) ){
+								callBack();
 							}
-						});
+						},
+						error: function( xhr ){
+							main.append('<p>'+ xhr.statusText +'</p>');
+						},
+						complete: function(){
+							loading( true );
+						}
 					});
 				});
 			}
@@ -951,22 +981,19 @@ var Modal = {
 				// CLEAN THE CONTENT DIV
 				.children('div.main').empty();
 
-			// BACK TO SCROLL POSITION
-			$('html').animate({ scrollTop: Modal.status.positionTop }, 'fast', function(){
-				// FADEOUT OF BACKGROUND
-				$('#backGround').fadeOut( 'fast',function(){
-					// RESET THE SCROLL POSITION
-					Modal.status.positionTop = 0;
+			// FADEOUT OF BACKGROUND
+			$('#backGround').fadeOut( 'fast',function(){
+				// RESET THE SCROLL POSITION
+				Modal.status.positionTop = 0;
 
-					// RESET THE MODAL TYPE
-					Modal.status.type = 'small';
+				// RESET THE MODAL TYPE
+				Modal.status.type = 'small';
 
-					// CALLBACK FUNCTION
-					if( $.isFunction( callBack ) ){
-						callBack();
-					}
-				} );
-			});
+				// CALLBACK FUNCTION
+				if( $.isFunction( callBack ) ){
+					callBack();
+				}
+			} );
 		} );
 	}
 };

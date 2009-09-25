@@ -1,0 +1,58 @@
+<?php
+// INCLUI O ARQUIVO DE FUNCOES
+require_once('../../includes/config.php');
+require_once('../../includes/functions.php');
+
+// CONECTA NO BANCO DE DADOS
+$conn = connect();
+
+// PEGA O ID
+$id = sanitize( $_REQUEST['id'] );
+
+// PEGA OS DADOS DA TASK
+$teams = select(
+	'history h',
+	array( 'h.id','h.name', 'h.text', 'h.estimate' ),
+	array( 'h.id = '.$id )
+);
+?>
+<form method="post" onsubmit="return Save.history();">
+	<input type="hidden" name="action" value="addHistory" />
+	<input type="hidden" name="id" value="" />
+	<div class="response"></div>
+
+	<label for="name">Name:</label>
+	<input type="text" name="name" value="" maxlength="255" />
+
+	<br />
+
+	<label for="estimate">Estimate:</label>
+	<select name="estimate">
+		<option value="0">0</option>
+		<option value="1">1</option>
+		<option value="2">2</option>
+		<option value="3">3</option>
+		<option value="5">5</option>
+		<option value="8">8</option>
+		<option value="13">13</option>
+		<option value="20">20</option>
+		<option value="40">40</option>
+		<option value="100">100</option>
+	</select>
+
+	<br /><br />
+
+	<label for="text">Description:</label>
+	<textarea name="text" rows="5"></textarea>
+
+	<br />
+
+	<input type="submit" value="Add history" />
+</form>
+<script type="text/javascript">
+	$(function(){
+		$('#content input:hidden[name=idSprint]').val(
+			$('#sprintSelect').val()
+		);
+	});
+</script>

@@ -3,6 +3,8 @@ Version 0.7.2:
 	* Change some task's margin;
 	* Added the project name on title and header;
 	* Modal is has now fixed position insted of absolute;
+	* Removed the scrolling when open / close a Modal;
+	* Added the Modal.loadBigger() for a 80% page Modal; 
 
 Version 0.7.1:
 	* Removed the short tag for compatibility;

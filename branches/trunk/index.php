@@ -28,6 +28,9 @@
 								<li>
 									<a href="javascript:void(0);" class="addTeam link">Add team</a>
 								</li>
+								<li>
+									<a href="javascript:void(0);" class="edtTeam link">Edit team</a>
+								</li>
 							</ul>
 						</li>
 						<li>&nbsp;</li>
@@ -76,6 +79,9 @@
 							<ul>
 								<li>
 									<a href="javascript:void(0);" class="addHistory link">Add history</a>
+								</li>
+								<li>
+									<a href="javascript:void(0);" class="edtHistory link">Edit history</a>
 								</li>
 							</ul>
 						</li>
