@@ -2,7 +2,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
     <head>
-        <title>[ scruwp :: <?php echo PROG_NAME; ?> ]</title>
+        <title>scruwp :: <?php echo PROG_NAME; ?></title>
 		<link rel="shortcut icon" href="favicon.ico">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8;"/>
 		<link rel="stylesheet" href="css/layout.css" type="text/css" media="all" />
@@ -132,7 +132,7 @@
 		</div>
     </body>
 	<head>
-        <script type="text/javascript" src="js/jquery-1.3.2.js"></script>
+        <script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
         <script type="text/javascript" src="js/jquery.ui-1.7.min.js"></script>
         <script type="text/javascript" src="js/jquery.cookie.js"></script>
         <script type="text/javascript" src="js/script.js"></script>
